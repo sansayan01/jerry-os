@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry OS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab active" data-module="ops">
+            <span class="tab-title">Ops</span>
+        </div>
+        <div class="tab" data-module="brain">
+            <span class="tab-title">Brain</span>
+        </div>
+        <div class="tab" data-module="lab">
+            <span class="tab-title">Lab</span>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Ops Module -->
+        <div id="ops-module" class="module active">
+            <div class="dashboard-header">
+                <h1>Operations Dashboard</h1>
+                <p class="dashboard-subtitle">Monitor system health and manage operations</p>
+            </div>
+
+            <!-- Mission Control -->
+            <div class="feature-section" id="mission-control">
+                <div class="feature-header">
+                    <i class="fas fa-satellite-dish"></i>
+                    <h2>Mission Control</h2>
+                </div>
+                <div class="mission-control-grid">
+                    <!-- Model Info -->
+                    <div class="mission-card">
+                        <div class="card-header">
+                            <i class="fas fa-microchip"></i>
+                            <h3>Current Model</h3>
+                        </div>
+                        <div class="card-content model-info">
+                            <div class="model-name" id="current-model">Loading...</div>
+                            <div class="model-details">
+                                <div class="detail-item">
+                                    <span class="label">Provider:</span>
+                                    <span class="value" id="model-provider">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">API:</span>
+                                    <span class="value" id="model-api">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">Status:</span>
+                                    <span class="value status-badge active" id="model-status">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div class="mission-card">
+                        <div class="card-header">
+                            <i class="fas fa-users"></i>
+                            <h3>Active Sessions</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="sessions-list" id="sessions-list">
+                                <div class="no-sessions">No active sessions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cron Health -->
+                    <div class="mission-card">
+                        <div class="card-header">
+                            <i class="fas fa-clock"></i>
+                            <h3>Cron Health</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="cron-overview" id="cron-overview">
+                                <div class="cron-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="total-crons">0</div>
+                                        <div class="stat-label">Total Crons</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="healthy-crons">0</div>
+                                        <div class="stat-label">Healthy</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value" id="failed-crons">0</div>
+                                        <div class="stat-label">Failed</div>
+                                    </div>
+                                </div>
+                                <div class="cron-list" id="cron-list">
+                                    <div class="no-crons">No crons configured</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Overview -->
+            <div class="feature-overview">
+                <h3>Available Features</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>Mission Control</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security Scanner</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-network-wired"></i>
+                        <span>Network Monitor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brain Module -->
+        <div id="brain-module" class="module">
+            <div class="dashboard-header">
+                <h1>Brain Dashboard</h1>
+                <p class="dashboard-subtitle">AI intelligence and automation hub</p>
+            </div>
+            <div class="feature-overview">
+                <h3>Coming Soon</h3>
+                <div class="feature-grid">
+                    <div class="feature-item disabled">
+                        <i class="fas fa-brain"></i>
+                        <span>Task Automation</span>
+                    </div>
+                    <div class="feature-item disabled">
+                        <i class="fas fa-robot"></i>
+                        <span>Agent Coordination</span>
+                    </div>
+                    <div class="feature-item disabled">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Learning Hub</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Module -->
+        <div id="lab-module" class="module">
+            <div class="dashboard-header">
+                <h1>Laboratory Dashboard</h1>
+                <p class="dashboard-subtitle">Experimentation and development tools</p>
+            </div>
+            <div class="feature-overview">
+                <h3>Coming Soon</h3>
+                <div class="feature-grid">
+                    <div class="feature-item disabled">
+                        <i class="fas fa-flask"></i>
+                        <span>Experiments</span>
+                    </div>
+                    <div class="feature-item disabled">
+                        <i class="fas fa-code"></i>
+                        <span>Code Sandbox</span>
+                    </div>
+                    <div class="feature-item disabled">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Dock -->
+    <div class="dock">
+        <div class="dock-item active" data-module="ops">
+            <i class="fas fa-cogs"></i>
+            <span class="dock-label">Ops</span>
+        </div>
+        <div class="dock-item" data-module="brain">
+            <i class="fas fa-brain"></i>
+            <span class="dock-label">Brain</span>
+        </div>
+        <div class="dock-item" data-module="lab">
+            <i class="fas fa-flask"></i>
+            <span class="dock-label">Lab</span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
