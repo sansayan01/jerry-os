@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry OS - Executive Interface</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="neo-executive.css">
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+</head>
+<body class="neo-theme">
+    <!-- Neo Executive Interface -->
+    <div class="neo-container">
+        <!-- Header -->
+        <header class="neo-header">
+            <div class="header-brand">
+                <i data-lucide="cpu" class="brand-icon"></i>
+                <span class="brand-name">Jerry Executive</span>
+            </div>
+            
+            <nav class="header-nav">
+                <div class="nav-item active" data-view="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-view="agents">
+                    <i data-lucide="bot"></i>
+                    <span>AI Agents</span>
+                </div>
+                <div class="nav-item" data-view="automation">
+                    <i data-lucide="workflow"></i>
+                    <span>Automation</span>
+                </div>
+                <div class="nav-item" data-view="analytics">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+
+            <div class="header-actions">
+                <div class="system-status">
+                    <div class="status-indicator online"></div>
+                    <span>Operational</span>
+                </div>
+                <button class="action-btn">
+                    <i data-lucide="settings"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="neo-main">
+            <!-- Dashboard View -->
+            <div class="view active" id="dashboard-view">
+                <div class="view-header">
+                    <h1>Executive Dashboard</h1>
+                    <p>Real-time system overview and performance metrics</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <!-- AI Model Card -->
+                    <div class="stat-card premium">
+                        <div class="card-header">
+                            <i data-lucide="cpu" class="card-icon"></i>
+                            <div class="card-title">
+                                <h3>AI Core</h3>
+                                <span class="card-badge">Active</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="model-info">
+                                <span class="model-name">nvidia/deepseek-ai/deepseek-v3.1</span>
+                                <div class="performance">
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" style="width: 85%"></div>
+                                    </div>
+                                    <span class="performance-value">85%</span>
+                                </div>
+                            </div>
+                            <div class="model-details">
+                                <div class="detail">
+                                    <span class="label">Provider</span>
+                                    <span class="value">NVIDIA</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="label">API</span>
+                                    <span class="value">OpenClaw Gateway</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="label">Latency</span>
+                                    <span class="value">128ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sessions Card -->
+                    <div class="stat-card">
+                        <div class="card-header">
+                            <i data-lucide="users" class="card-icon"></i>
+                            <div class="card-title">
+                                <h3>Active Sessions</h3>
+                                <span class="card-badge">3 Online</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sessions-list">
+                                <div class="session">
+                                    <i data-lucide="terminal"></i>
+                                    <div class="session-info">
+                                        <span class="session-name">Main Session</span>
+                                        <span class="session-status active">Active</span>
+                                    </div>
+                                </div>
+                                <div class="session">
+                                    <i data-lucide="code"></i>
+                                    <div class="session-info">
+                                        <span class="session-name">Builder Agent</span>
+                                        <span class="session-status active">Running</span>
+                                    </div>
+                                </div>
+                                <div class="session">
+                                    <i data-lucide="bot"></i>
+                                    <div class="session-info">
+                                        <span class="session-name">Assistant Core</span>
+                                        <span class="session-status idle">Standby</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Health Card -->
+                    <div class="stat-card">
+                        <div class="card-header">
+                            <i data-lucide="activity" class="card-icon"></i>
+                            <div class="card-title">
+                                <h3>System Health</h3>
+                                <span class="card-badge">Optimal</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="health-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">CPU</span>
+                                    <div class="metric-visual">
+                                        <div class="metric-bar">
+                                            <div class="metric-fill" style="width: 65%"></div>
+                                        </div>
+                                        <span class="metric-value">65%</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Memory</span>
+                                    <div class="metric-visual">
+                                        <div class="metric-bar">
+                                            <div class="metric-fill" style="width: 42%"></div>
+                                        </div>
+                                        <span class="metric-value">42%</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Network</span>
+                                    <div class="metric-visual">
+                                        <div class="metric-bar">
+                                            <div class="metric-fill" style="width: 28%"></div>
+                                        </div>
+                                        <span class="metric-value">28%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Automation Card -->
+                    <div class="stat-card">
+                        <div class="card-header">
+                            <i data-lucide="clock" class="card-icon"></i>
+                            <div class="card-title">
+                                <h3>Automation</h3>
+                                <span class="card-badge">5 Active</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="automation-stats">
+                                <div class="stat">
+                                    <span class="stat-value">12</span>
+                                    <span class="stat-label">Total Tasks</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value">8</span>
+                                    <span class="stat-label">Completed</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value">4</span>
+                                    <span class="stat-label">Running</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command Interface -->
+                <div class="command-section">
+                    <div class="command-header">
+                        <i data-lucide="message-square"></i>
+                        <h2>Executive Command</h2>
+                    </div>
+                    
+                    <div class="command-interface">
+                        <div class="command-history">
+                            <div class="message executive">
+                                <i data-lucide="cpu"></i>
+                                <div class="message-content">
+                                    <p>System initialized and ready for commands</p>
+                                    <span class="message-time">11:58 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="command-input">
+                            <textarea placeholder="Enter executive command..." rows="2"></textarea>
+                            <button class="send-button">
+                                <i data-lucide="send"></i>
+                                Execute
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="neo-executive.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
