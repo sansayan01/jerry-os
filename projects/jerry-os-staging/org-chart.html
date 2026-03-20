@@ -1,0 +1,201 @@
+<!-- Org Chart Tab -->
+<div id="org-chart" class="tab-pane">
+    <div class="org-chart-container">
+        <div class="org-header">
+            <h2>Agent Organization Chart</h2>
+            <p class="org-subtitle">Multi-agent hierarchy and delegation structure</p>
+        </div>
+        
+        <div class="org-hierarchy">
+            <!-- Level 1: Human -->
+            <div class="org-level human-level">
+                <div class="org-node human-node">
+                    <div class="node-icon">
+                        <i data-lucide="user"></i>
+                    </div>
+                    <div class="node-content">
+                        <h3>Sayan</h3>
+                        <p>Executive Director</p>
+                        <span class="node-badge">Human</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection line -->
+            <div class="org-connection"></div>
+            
+            <!-- Level 2: Jerry (Executive Assistant) -->
+            <div class="org-level executive-level">
+                <div class="org-node executive-node">
+                    <div class="node-icon">
+                        <i data-lucide="bot"></i>
+                    </div>
+                    <div class="node-content">
+                        <h3>Jerry</h3>
+                        <p>Executive Assistant</p>
+                        <span class="node-badge primary">GOAT</span>
+                        <div class="node-stats">
+                            <span>Delegation Hub</span>
+                            <span>Coordination</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection lines to agents -->
+            <div class="org-connections-multi">
+                <div class="connection-line"></div>
+                <div class="connection-line"></div>
+                <div class="connection-line"></div>
+            </div>
+            
+            <!-- Level 3: Primary Agents -->
+            <div class="org-level agents-level">
+                <!-- Technical Lead Agent -->
+                <div class="org-node agent-node">
+                    <div class="node-icon">
+                        <i data-lucide="code-2"></i>
+                    </div>
+                    <div class="node-content">
+                        <h3>Technical Lead</h3>
+                        <p>Code & Infrastructure</p>
+                        <span class="node-badge">Agent</span>
+                        <div class="node-status">
+                            <span class="status-dot planned"></span>
+                            <span>Planned</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project Manager Agent -->
+                <div class="org-node agent-node">
+                    <div class="node-icon">
+                        <i data-lucide="clipboard-list"></i>
+                    </div>
+                    <div class="node-content">
+                        <h3>Project Manager</h3>
+                        <p>Coordination & Tracking</p>
+                        <span class="node-badge">Agent</span>
+                        <div class="node-status">
+                            <span class="status-dot planned"></span>
+                            <span>Planned</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Research Agent -->
+                <div class="org-node agent-node">
+                    <div class="node-icon">
+                        <i data-lucide="search"></i>
+                    </div>
+                    <div class="node-content">
+                        <h3>Research Agent</h3>
+                        <p>Information & Analysis</p>
+                        <span class="node-badge">Agent</span>
+                        <div class="node-status">
+                            <span class="status-dot planned"></span>
+                            <span>Planned</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection lines to sub-agents -->
+            <div class="org-connections-sub">
+                <div class="sub-connection"></div>
+                <div class="sub-connection"></div>
+                <div class="sub-connection"></div>
+            </div>
+            
+            <!-- Level 4: Sub-Agents -->
+            <div class="org-level subagents-level">
+                <!-- Client/Project Sub-Agents -->
+                <div class="org-subgroup">
+                    <h4>Client Work</h4>
+                    <div class="subagent-grid">
+                        <div class="subagent-node">
+                            <i data-lucide="briefcase"></i>
+                            <span>Client A</span>
+                        </div>
+                        <div class="subagent-node">
+                            <i data-lucide="briefcase"></i>
+                            <span>Client B</span>
+                        </div>
+                        <div class="subagent-node">
+                            <i data-lucide="briefcase"></i>
+                            <span>Client C</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-subgroup">
+                    <h4>Rapid Crafters</h4>
+                    <div class="subagent-grid">
+                        <div class="subagent-node">
+                            <i data-lucide="rocket"></i>
+                            <span>Product 1</span>
+                        </div>
+                        <div class="subagent-node">
+                            <i data-lucide="rocket"></i>
+                            <span>Product 2</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="org-subgroup">
+                    <h4>Internal Projects</h4>
+                    <div class="subagent-grid">
+                        <div class="subagent-node">
+                            <i data-lucide="wrench"></i>
+                            <span>Infra</span>
+                        </div>
+                        <div class="subagent-node">
+                            <i data-lucide="database"></i>
+                            <span>Data</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="org-legend">
+            <div class="legend-item">
+                <span class="legend-dot human"></span>
+                <span>Human Director</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot executive"></span>
+                <span>Executive Assistant</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot agent"></span>
+                <span>Primary Agent</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot subagent"></span>
+                <span>Sub-Agent</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot planned"></span>
+                <span>Planned</span>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="org-actions">
+            <button class="org-action-btn">
+                <i data-lucide="plus"></i>
+                <span>Add Agent</span>
+            </button>
+            <button class="org-action-btn">
+                <i data-lucide="settings"></i>
+                <span>Configure</span>
+            </button>
+            <button class="org-action-btn">
+                <i data-lucide="download"></i>
+                <span>Export Chart</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry OS — Executive Assistant</title>
+    <meta name="description" content="Jerry OS - AI-powered executive assistant interface for OpenClaw">
+    <link rel="stylesheet" href="styles.css?v=20260319">
+    <link rel="stylesheet" href="org-chart-styles.css">
+    <link rel="stylesheet" href="laboratory-styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- ═══ Sidebar ═══ -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i data-lucide="zap"></i>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-item active" data-module="ops">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="tooltip">Operations</span>
+                </div>
+                <div class="sidebar-item" data-module="brain">
+                    <i data-lucide="brain-circuit"></i>
+                    <span class="tooltip">Brain</span>
+                </div>
+                <div class="sidebar-item" data-module="lab">
+                    <i data-lucide="flask-conical"></i>
+                    <span class="tooltip">Laboratory</span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <div class="sidebar-item" data-action="agents">
+                    <i data-lucide="bot"></i>
+                    <span class="tooltip">AI Agents</span>
+                </div>
+                <div class="sidebar-item" data-action="analytics">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span class="tooltip">Analytics</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-item" data-action="settings">
+                    <i data-lucide="settings"></i>
+                    <span class="tooltip">Settings</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══ Main Wrapper ═══ -->
+        <div class="main-wrapper">
+            <!-- ── Top Bar ── -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <!-- Tab bar removed - dashboard is default view -->
+                </div>
+                <div class="top-bar-right">
+                    <div class="clock-display" id="live-clock">--:--</div>
+                    <div class="system-status">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
+                    </div>
+                    <button class="top-bar-btn" id="refresh-btn" title="Refresh Data">
+                        <i data-lucide="refresh-cw"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ── Main Content ── -->
+            <div class="main-content">
+
+                <!-- ═══ Ops Module ═══ -->
+                <div id="ops-module" class="module active">
+
+                    <!-- MC Tab Bar -->
+                    <div class="mc-tabs">
+                        <button class="mc-tab active" data-mc-tab="mission-control">Mission Control</button>
+                        <button class="mc-tab" data-mc-tab="org-chart">Org Chart</button>
+                    </div>
+
+                    <!-- MC Tab: Mission Control -->
+                    <div class="mc-tab-pane active" id="mc-mission-control">
+
+                        <!-- MC Header -->
+                        <div class="mc-header">
+                            <div class="mc-title">
+                                <span class="mc-title-icon">🚀</span>
+                                <h1>Mission Control</h1>
+                            </div>
+                            <div class="mc-refresh-timer" id="mc-refresh-timer">
+                                <i data-lucide="refresh-cw" class="mc-refresh-icon"></i>
+                                <span id="mc-timer-text">—</span>
+                            </div>
+                        </div>
+
+                        <!-- Models Section -->
+                        <div class="mc-section">
+                            <div class="mc-section-header">
+                                <span class="mc-section-icon">⚙</span>
+                                <h2>Models</h2>
+                            </div>
+                            <div class="mc-models-row" id="mc-models-row">
+                                <!-- Model cards rendered by JS -->
+                                <div class="mc-model-card shimmer">
+                                    <div class="mc-model-name">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Sessions Section -->
+                        <div class="mc-section">
+                            <div class="mc-section-header">
+                                <span class="mc-section-icon">📡</span>
+                                <h2>Active Sessions</h2>
+                            </div>
+                            <div class="mc-sessions" id="mc-sessions">
+                                <!-- Session cards rendered by JS -->
+                                <div class="mc-no-data">No active sessions</div>
+                            </div>
+                        </div>
+
+                        <!-- Cron Jobs Section -->
+                        <div class="mc-section">
+                            <div class="mc-section-header">
+                                <span class="mc-section-icon">⏰</span>
+                                <h2>Cron Jobs</h2>
+                            </div>
+                            <div class="mc-cron-table-wrap" id="mc-cron-table-wrap">
+                                <table class="mc-cron-table">
+                                    <thead>
+                                        <tr>
+                                            <th>NAME</th>
+                                            <th>SCHEDULE</th>
+                                            <th>ENABLED</th>
+                                            <th>LAST RUN</th>
+                                            <th>STATUS</th>
+                                            <th>NEXT RUN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mc-cron-tbody">
+                                        <tr><td colspan="6" class="mc-no-data">No crons configured</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div><!-- /mc-mission-control -->
+
+                    <!-- MC Tab: Org Chart -->
+                    <div class="mc-tab-pane" id="mc-org-chart">
+                        <div class="org-chart-header">
+                            <div class="org-header-left">
+                                <i data-lucide="git-merge" class="org-icon"></i>
+                                <h2>Org Chart</h2>
+                            </div>
+                            <div class="org-header-stats" id="org-dynamic-stats">
+                                <span class="stat-item">15 agents</span>
+                                <span class="stat-item active-stat">1 active</span>
+                                <span class="stat-item">14 planned</span>
+                            </div>
+                        </div>
+                        
+                        <div class="org-chart-toolbar">
+                            <div class="toolbar-left">
+                                <div class="org-search-box">
+                                    <i data-lucide="search"></i>
+                                    <input type="text" id="org-search-input" placeholder="Search agents... (Ctrl+F)" oninput="window.jerryOS.searchAgent(this.value)">
+                                </div>
+                            </div>
+                            <div class="toolbar-center">
+                                <span class="toolbar-info">Click chiefs to expand · <kbd>H</kbd> Heat · <kbd>S</kbd> Synapses · <kbd>Esc</kbd> Close</span>
+                            </div>
+                            <div class="toolbar-right">
+                                <button class="toolbar-btn" id="heatmap-toggle" onclick="window.jerryOS.toggleHeatMap()" title="Toggle Heat Map (H)">
+                                    <i data-lucide="thermometer"></i>
+                                    <span>Heat Map</span>
+                                </button>
+                                <button class="toolbar-btn" id="synapse-toggle" onclick="window.jerryOS.toggleSynapses()" title="Toggle Synapses (S)">
+                                    <i data-lucide="zap"></i>
+                                    <span>Synapses</span>
+                                </button>
+                                <button class="toolbar-btn" onclick="window.jerryOS.undoOrgAction()" title="Undo (Ctrl+Z)">
+                                    <i data-lucide="undo-2"></i>
+                                </button>
+                                <button class="toolbar-btn" onclick="window.jerryOS.redoOrgAction()" title="Redo (Ctrl+Y)">
+                                    <i data-lucide="redo-2"></i>
+                                </button>
+                                <button class="toolbar-btn" onclick="window.jerryOS.exportOrgChart('json')" title="Export JSON">
+                                    <i data-lucide="download"></i>
+                                </button>
+                                <button class="toolbar-btn" onclick="window.jerryOS.exportOrgChart('png')" title="Export PNG">
+                                    <i data-lucide="image"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Team Analytics Bar -->
+                        <div class="org-analytics-bar" id="org-analytics-bar">
+                            <div class="analytics-chip">
+                                <i data-lucide="users"></i>
+                                <span id="analytics-total">15</span>
+                                <label>Total</label>
+                            </div>
+                            <div class="analytics-chip active-chip">
+                                <i data-lucide="activity"></i>
+                                <span id="analytics-active">1</span>
+                                <label>Active</label>
+                            </div>
+                            <div class="analytics-chip">
+                                <i data-lucide="clock"></i>
+                                <span id="analytics-planned">14</span>
+                                <label>Planned</label>
+                            </div>
+                            <div class="analytics-divider"></div>
+                            <div class="analytics-chip">
+                                <i data-lucide="cpu"></i>
+                                <span id="analytics-models">—</span>
+                                <label>Models</label>
+                            </div>
+                            <div class="analytics-chip cost-chip">
+                                <i data-lucide="dollar-sign"></i>
+                                <span id="analytics-cost">$0</span>
+                                <label>Est. Daily</label>
+                            </div>
+                        </div>
+
+                        <div id="mc-org-pane" class="org-tree-layout">
+                            <!-- Rendered dynamically via JS -->
+                            <div class="loading-spinner" style="text-align: center; color: var(--text-tertiary); padding: 40px;">Loading architecture...</div>
+                            <!-- Minimap -->
+                            <div class="org-minimap" id="org-minimap">
+                                <div class="minimap-viewport" id="minimap-viewport"></div>
+                                <div class="minimap-content" id="minimap-content"></div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Dossier Sidebar -->
+                        <div id="agent-dossier-sidebar" class="dossier-sidebar glass">
+                            <div class="sidebar-header">
+                                <div class="sidebar-title-group">
+                                    <i data-lucide="shield"></i>
+                                    <h3>Agent Dossier</h3>
+                                </div>
+                                <button class="close-sidebar-btn" onclick="window.jerryOS.closeDossier()"><i data-lucide="x"></i></button>
+                            </div>
+                            <div id="dossier-content" class="sidebar-body">
+                                <!-- Dynamic content here -->
+                            </div>
+                        </div>
+                    </div><!-- /mc-org-chart -->
+                </div><!-- /ops-module -->
+                    
+			<!-- ═══ Brain Module ═══ -->
+                <div id="brain-module" class="module">
+                    <div class="dashboard-header">
+                        <div class="greeting-section">
+                            <div class="greeting-text">
+                                <h1>Brain <span class="accent">Dashboard</span></h1>
+                                <p class="dashboard-subtitle">Knowledge and intelligence layer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brain Tabs Nav -->
+                    <div class="brain-tabs-nav">
+                        <button class="brain-tab active" data-brain-tab="daily-briefs">Daily Briefs</button>
+                        <button class="brain-tab" data-brain-tab="automations">Automations</button>
+                        <button class="brain-tab" data-brain-tab="documentation">Documentation</button>
+                    </div>
+
+                    <div class="brain-content-area">
+                        <!-- Daily Briefs Tab -->
+                        <div id="brain-daily-briefs" class="brain-tab-pane active">
+                            <div class="brain-split-layout">
+                                <!-- Sidebar for Brief History -->
+                                <div class="brain-sidebar">
+                                    <div class="brain-sidebar-header">
+                                        <i data-lucide="calendar"></i>
+                                        <h3>HISTORY</h3>
+                                    </div>
+                                    <div class="brain-sidebar-list" id="briefs-history-list">
+                                        <!-- Rendered dynamically -->
+                                        <div class="brain-loading-shimmer"></div>
+                                        <div class="brain-loading-shimmer"></div>
+                                        <div class="brain-loading-shimmer"></div>
+                                    </div>
+                                </div>
+                                <!-- Content Area for Brief -->
+                                <div class="brain-main-content">
+                                    <div id="brief-content-renderer" class="markdown-body">
+                                        <div class="empty-state">
+                                            <i data-lucide="file-text"></i>
+                                            <p>Select a daily brief from the history to view it.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Automations Tab -->
+                        <div id="brain-automations" class="brain-tab-pane">
+                            <div class="brain-page-header">
+                                <div class="brain-page-title">
+                                    <i data-lucide="zap"></i>
+                                    <h2>Automations</h2>
+                                </div>
+                                <p class="brain-page-subtitle">Cron jobs and scheduled tasks</p>
+                                <div class="brain-page-stats">
+                                    <span id="automations-count-badge">0 cron jobs</span>
+                                </div>
+                            </div>
+                            <div class="automations-list" id="automations-list-container">
+                                <!-- Rendered dynamically -->
+                                <div class="brain-no-data">Loading automations...</div>
+                            </div>
+                        </div>
+
+                        <!-- Documentation Tab -->
+                        <div id="brain-documentation" class="brain-tab-pane">
+                            <div class="brain-split-layout">
+                                <!-- Sidebar for Doc Pages -->
+                                <div class="brain-sidebar">
+                                    <div class="brain-sidebar-header">
+                                        <i data-lucide="file"></i>
+                                        <h3>PAGES</h3>
+                                    </div>
+                                    <div class="brain-sidebar-list" id="docs-pages-list">
+                                        <!-- Rendered dynamically -->
+                                        <div class="brain-loading-shimmer"></div>
+                                    </div>
+                                </div>
+                                <!-- Content Area for Docs -->
+                                <div class="brain-main-content">
+                                    <div id="docs-content-renderer" class="markdown-body">
+                                        <div class="empty-state">
+                                            <i data-lucide="book-open"></i>
+                                            <p>Select a document from the pages list to read.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Lab Module ═══ -->
+                <div id="lab-module" class="module">
+                    <div class="lab-dashboard-header">
+                        <div class="lab-title-group">
+                            <h1>Laboratory <span class="accent">Intelligence</span></h1>
+                            <p class="lab-subtitle">Experimentation, System Development & Real-time Analytics</p>
+                        </div>
+                        <div class="header-meta">
+                            <span class="status-badge active">Operational</span>
+                        </div>
+                    </div>
+
+                    <div class="lab-grid">
+                        <!-- Prototypes Section -->
+                        <div class="lab-card">
+                            <div class="card-icon-box"><i data-lucide="cpu"></i></div>
+                            <h3>Active Prototypes <span class="card-badge" id="lab-prototypes-count">...</span></h3>
+                            <div class="lab-systems-list" id="lab-prototypes-container">
+                                <div class="shimmer-bg" style="height: 60px; border-radius: 12px; margin-bottom: 10px;"></div>
+                                <div class="shimmer-bg" style="height: 60px; border-radius: 12px; margin-bottom: 10px;"></div>
+                                <div class="shimmer-bg" style="height: 60px; border-radius: 12px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Builds Section -->
+                        <div class="lab-card">
+                            <div class="card-icon-box"><i data-lucide="git-branch"></i></div>
+                            <h3>Recent Nightly Builds</h3>
+                            <div class="lab-builds-list" id="lab-builds-container">
+                                <div class="shimmer-bg" style="height: 40px; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div class="shimmer-bg" style="height: 40px; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div class="shimmer-bg" style="height: 40px; border-radius: 8px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Self-Improvement Section -->
+                        <div class="lab-card">
+                            <div class="card-icon-box"><i data-lucide="rocket"></i></div>
+                            <h3>Self-Improvement Protocol</h3>
+                            <div class="lab-progress-list" id="lab-improvements-container">
+                                <div class="shimmer-bg" style="height: 30px; border-radius: 6px; margin-bottom: 15px;"></div>
+                                <div class="shimmer-bg" style="height: 30px; border-radius: 6px; margin-bottom: 15px;"></div>
+                                <div class="shimmer-bg" style="height: 30px; border-radius: 6px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Metrics Bar -->
+                    <div class="lab-metrics-bar" id="lab-metrics-container">
+                        <div class="lab-metric-card">
+                            <span class="metric-v" id="lab-uptime">...</span>
+                            <span class="metric-l">System Uptime</span>
+                        </div>
+                        <div class="lab-metric-card">
+                            <span class="metric-v" id="lab-latency">...</span>
+                            <span class="metric-l">Avg Latency</span>
+                        </div>
+                        <div class="lab-metric-card">
+                            <span class="metric-v" id="lab-requests">...</span>
+                            <span class="metric-l">Daily Throughput</span>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /main-content -->
+        </div><!-- /main-wrapper -->
+
+
+
+    
+    <!-- Agent Logs Overlay -->
+    <div id="agent-logs-overlay" class="logs-overlay glass">
+        <div class="logs-header">
+            <div class="logs-title">
+                <i data-lucide="terminal"></i>
+                <h3 id="logs-agent-name">Agent Logs</h3>
+            </div>
+            <button class="close-logs-btn" onclick="window.jerryOS.closeLogs()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="logs-viewport" id="logs-viewport">
+            <!-- Console output here -->
+            <div class="log-line system">[INITIALIZING CONSOLE]</div>
+        </div>
+        <div class="logs-footer">
+            <span class="pulse-indicator"></span>
+            <span class="status-msg">Live Stream Active</span>
+        </div>
+    </div>
+
+    <!-- Dynamic Data Loading Containers -->
+    <div id="model-cards" style="display: none;"></div>
+    <div id="session-rows" style="display: none;"></div>
+    <div id="cron-rows" style="display: none;"></div>
+
+</div><!-- /app-shell -->
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+    <script src="app.js?v=20260319"></script>
+<!-- Floating Chatbot Popup -->
+<div id="chatbot-container">
+    <div id="chatbot-button" onclick="toggleChatbot()">
+        <div class="chatbot-icon"><i data-lucide="bot"></i></div>
+        <div class="chatbot-badge">1</div>
+    </div>
+    <div id="chatbot-window">
+        <div class="chatbot-header">
+            <div class="chatbot-title"><i data-lucide="bot"></i><span>Jerry Assistant</span></div>
+            <div class="chatbot-status"><span class="status-dot online"></span><span>Online</span></div>
+            <button class="chatbot-close" onclick="toggleChatbot()"><i data-lucide="x"></i></button>
+        </div>
+        <div id="chatbot-messages">
+            <div class="chatbot-welcome">
+                <div class="welcome-icon"><i data-lucide="sparkles"></i></div>
+                <p>Hey there! ??</p>
+                <p>I'm Jerry, your executive assistant. How can I help?</p>
+            </div>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatbotKeyPress(event)">
+            <button id="chatbot-send" onclick="sendChatbotMessage()"><i data-lucide="send"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Data Loading Containers -->
+<div id="model-cards" style="display: none;"></div>
+<div id="session-rows" style="display: none;"></div>
+<div id="cron-rows" style="display: none;"></div>
+</body>
+</html>
+
+
+

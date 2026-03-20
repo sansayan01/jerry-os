@@ -1,0 +1,147 @@
+{
+    "director": {
+        "id": "director",
+        "name": "Sayan",
+        "role": "Founder, Rapid Cradters, Final authority on all decisions.",
+        "badge": "The Human",
+        "icon": "crown",
+        "model": "deepseek-v3.1"
+    },
+    "executive": {
+        "id": "executive",
+        "name": "Jerry",
+        "role": "Orchestration layer. Delegates to chiefs, manages crons, runs ops.",
+        "badge": "Executive Assistant",
+        "icon": "bot",
+        "status": "ACTIVE",
+        "stats": [
+            "100% Load",
+            "Fast-Track",
+            "24/7 Monitoring"
+        ],
+        "model": "deepseek-v3.1"
+    },
+    "agents": [
+        {
+            "id": "content-chief",
+            "name": "CC (Content Chief)",
+            "role": "Content & Media",
+            "description": "Manages, YouTube, blog posts, social media, bootcamp materials.",
+            "icon": "megaphone",
+            "status": "PLANNED",
+            "subAgentsCount": 3,
+            "subAgents": [
+                {
+                    "id": "content-sub-1",
+                    "name": "Video Editor AI",
+                    "role": "Final Cut & B-Roll",
+                    "icon": "film"
+                },
+                {
+                    "id": "content-sub-2",
+                    "name": "Copywriter AI",
+                    "role": "Scripts & Blogs",
+                    "icon": "pen-tool"
+                },
+                {
+                    "id": "content-sub-3",
+                    "name": "Social Manager",
+                    "role": "Engagement & Scheduling",
+                    "icon": "share-2"
+                }
+            ],
+            "activity": "Drafting outline for upcoming AI Bootcamp episode.",
+            "model": "deepseek-v3.1"
+        },
+        {
+            "id": "dev-chief",
+            "name": "DC (Dev Chief)",
+            "role": "Engineering & DevOps",
+            "description": "Code quality, deployments, infrastructure, Jerry-OS development.",
+            "icon": "code-2",
+            "status": "PLANNED",
+            "subAgentsCount": 3,
+            "subAgents": [
+                {
+                    "id": "dev-sub-1",
+                    "name": "Frontend Agent",
+                    "role": "UI/UX & React",
+                    "icon": "palette"
+                },
+                {
+                    "id": "dev-sub-2",
+                    "name": "Backend Architect",
+                    "role": "APIs & Databases",
+                    "icon": "server",
+                    "model": "glm5",
+                    "description": ""
+                },
+                {
+                    "id": "dev-sub-3",
+                    "name": "DevOps Bot",
+                    "role": "CI/CD & Cloud",
+                    "icon": "cloud-lightning",
+                    "model": "glm5",
+                    "description": ""
+                }
+            ],
+            "activity": "Optimizing API response times for Brain module.",
+            "model": "deepseek-v3.1"
+        },
+        {
+            "id": "ops-chief",
+            "name": "OC (Ops Chief)",
+            "role": "Operations & Client Work",
+            "description": "Client project management, invoicing, task delegation, SLA tracking.",
+            "icon": "shield",
+            "status": "PLANNED",
+            "subAgentsCount": 2,
+            "subAgents": [
+                {
+                    "id": "ops-sub-1",
+                    "name": "Project Manager",
+                    "role": "SLA & Milestones",
+                    "icon": "calendar"
+                },
+                {
+                    "id": "ops-sub-2",
+                    "name": "Billing Agent",
+                    "role": "Invoices & Stripe",
+                    "icon": "credit-card"
+                }
+            ],
+            "activity": "Preparing monthly SLA reports for Clearmud clients.",
+            "model": "deepseek-v3.1"
+        },
+        {
+            "id": "intel-chief",
+            "name": "IC (Intel Chief)",
+            "role": "Research & Intelligence",
+            "description": "AI industry monitoring, competitive intelligence, opportunity scanning.",
+            "icon": "brain-circuit",
+            "status": "PLANNED",
+            "subAgentsCount": 2,
+            "subAgents": [
+                {
+                    "id": "intel-sub-1",
+                    "name": "Trend Spotter",
+                    "role": "X/Twitter & News",
+                    "icon": "search"
+                },
+                {
+                    "id": "intel-sub-2",
+                    "name": "Market Analyst",
+                    "role": "Growth & ROI",
+                    "icon": "trending-up"
+                }
+            ],
+            "activity": "Scanning AI trends for the next strategy update.",
+            "model": "deepseek-v3.1"
+        }
+    ],
+    "stats": {
+        "total": 15,
+        "active": 1,
+        "planned": 14
+    }
+}

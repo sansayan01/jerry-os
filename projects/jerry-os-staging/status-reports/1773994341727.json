@@ -1,0 +1,19 @@
+{
+  "period": "weekly",
+  "generatedAt": "2026-03-20T08:12:21.727Z",
+  "metrics": {
+    "tasksCompleted": 51,
+    "tasksPending": 9,
+    "clientSatisfaction": 94,
+    "revenue": 10361
+  },
+  "highlights": [
+    "Successfully delivered Client A project",
+    "Reduced response time by 15%",
+    "On track for Q1 goals"
+  ],
+  "risks": [
+    "Client B deadline approaching",
+    "Resource allocation needed for Client C"
+  ]
+}
