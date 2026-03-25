@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Task Orchestrator Schema",
+  "description": "Schema for hybrid task orchestration with parallel/sequential checkpoints",
+  
+  "type": "object",
+  "required": ["version", "currentTask", "phases"],
+  
+  "properties": {
+    "version": { "type": "string" },
+    
+    "currentTask": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "targetPath": { "type": "string" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "status", "checkpoints"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { 
+            "type": "string", 
+            "enum": ["pending", "in_progress", "completed", "failed"] 
+          },
+          "parallel": { "type": "boolean" },
+          "dependsOn": { 
+            "type": "array", 
+            "items": { "type": "string" } 
+          },
+          "checkpoints": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "status": { 
+                  "type": "string", 
+                  "enum": ["pending", "in_progress", "completed", "failed"] 
+                },
+                "agentId": { "type": "string" },
+                "files": { 
+                  "type": "array", 
+                  "items": { "type": "string" } 
+                },
+                "startedAt": { "type": "string", "format": "date-time" },
+                "completedAt": { "type": "string", "format": "date-time" },
+                "retryCount": { "type": "integer", "default": 0 }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "activeAgents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agentId": { "type": "string" },
+          "checkpointId": { "type": "string" },
+          "phaseId": { "type": "string" },
+          "spawnedAt": { "type": "string", "format": "date-time" },
+          "lastHeartbeat": { "type": "string", "format": "date-time" },
+          "status": { 
+            "type": "string", 
+            "enum": ["spawning", "running", "stalled", "completed", "failed"] 
+          },
+          "output": { "type": "string" }
+        }
+      }
+    },
+    
+    "completedAgents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agentId": { "type": "string" },
+          "checkpointId": { "type": "string" },
+          "completedAt": { "type": "string", "format": "date-time" },
+          "success": { "type": "boolean" },
+          "filesCreated": { 
+            "type": "array", 
+            "items": { "type": "string" } 
+          }
+        }
+      }
+    },
+    
+    "rules": {
+      "type": "object",
+      "properties": {
+        "parallelThreshold": { "type": "string" },
+        "sequentialThreshold": { "type": "string" },
+        "maxParallelAgents": { "type": "integer", "minimum": 1 },
+        "checkpointTimeout": { "type": "integer", "description": "minutes" },
+        "heartbeatInterval": { "type": "integer", "description": "seconds" },
+        "retryLimit": { "type": "integer" }
+      }
+    }
+  }
+}

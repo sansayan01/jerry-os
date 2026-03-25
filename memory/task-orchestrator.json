@@ -1,0 +1,92 @@
+{
+  "version": "1.0",
+  "currentTask": {
+    "id": "axiom-pro-frontend",
+    "name": "AXIOM PRO Frontend Build",
+    "description": "Build React+TypeScript frontend for enterprise todo SaaS",
+    "targetPath": "D:\\Sayan\\Projects\\todo\\frontend",
+    "startedAt": "2026-03-26T01:12:00+05:30",
+    "updatedAt": "2026-03-26T01:12:00+05:30"
+  },
+  "phases": [
+    {
+      "id": "phase-1-core",
+      "name": "Core Structure",
+      "status": "in_progress",
+      "parallel": false,
+      "dependsOn": [],
+      "checkpoints": [
+        {"id": "cp-1-1", "name": "index.css global styles", "status": "pending", "files": ["src/index.css"]},
+        {"id": "cp-1-2", "name": "App.tsx main component", "status": "pending", "files": ["src/App.tsx"]},
+        {"id": "cp-1-3", "name": "vite-env.d.ts types", "status": "pending", "files": ["src/vite-env.d.ts"]}
+      ]
+    },
+    {
+      "id": "phase-2-contexts",
+      "name": "React Contexts",
+      "status": "pending",
+      "parallel": true,
+      "dependsOn": ["phase-1-core"],
+      "checkpoints": [
+        {"id": "cp-2-1", "name": "AuthContext", "status": "pending", "files": ["src/contexts/AuthContext.tsx"]},
+        {"id": "cp-2-2", "name": "SocketContext", "status": "pending", "files": ["src/contexts/SocketContext.tsx"]}
+      ]
+    },
+    {
+      "id": "phase-3-hooks",
+      "name": "Custom Hooks",
+      "status": "pending",
+      "parallel": true,
+      "dependsOn": ["phase-2-contexts"],
+      "checkpoints": [
+        {"id": "cp-3-1", "name": "useAuth hook", "status": "pending", "files": ["src/hooks/useAuth.ts"]},
+        {"id": "cp-3-2", "name": "useApi hook", "status": "pending", "files": ["src/hooks/useApi.ts"]}
+      ]
+    },
+    {
+      "id": "phase-4-services",
+      "name": "API Services",
+      "status": "pending",
+      "parallel": true,
+      "dependsOn": ["phase-3-hooks"],
+      "checkpoints": [
+        {"id": "cp-4-1", "name": "api client", "status": "pending", "files": ["src/services/api.ts"]},
+        {"id": "cp-4-2", "name": "auth service", "status": "pending", "files": ["src/services/auth.ts"]}
+      ]
+    },
+    {
+      "id": "phase-5-components",
+      "name": "UI Components",
+      "status": "pending",
+      "parallel": true,
+      "dependsOn": ["phase-4-services"],
+      "checkpoints": [
+        {"id": "cp-5-1", "name": "Layout components", "status": "pending", "files": ["src/components/Layout.tsx"]},
+        {"id": "cp-5-2", "name": "Sidebar component", "status": "pending", "files": ["src/components/Sidebar.tsx"]},
+        {"id": "cp-5-3", "name": "TaskList component", "status": "pending", "files": ["src/components/TaskList.tsx"]}
+      ]
+    },
+    {
+      "id": "phase-6-pages",
+      "name": "Page Components",
+      "status": "pending",
+      "parallel": true,
+      "dependsOn": ["phase-5-components"],
+      "checkpoints": [
+        {"id": "cp-6-1", "name": "Dashboard page", "status": "pending", "files": ["src/pages/Dashboard.tsx"]},
+        {"id": "cp-6-2", "name": "Login page", "status": "pending", "files": ["src/pages/Login.tsx"]},
+        {"id": "cp-6-3", "name": "Tasks page", "status": "pending", "files": ["src/pages/Tasks.tsx"]}
+      ]
+    }
+  ],
+  "activeAgents": [],
+  "completedAgents": [],
+  "rules": {
+    "parallelThreshold": "Independent checkpoints with no file overlap",
+    "sequentialThreshold": "Checkpoints that depend on previous output",
+    "maxParallelAgents": 3,
+    "checkpointTimeout": 15,
+    "heartbeatInterval": 30,
+    "retryLimit": 2
+  }
+}

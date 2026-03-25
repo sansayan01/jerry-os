@@ -210,3 +210,33 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+## Task Orchestration - For Large Tasks
+
+**For tasks > 10 minutes or > 5 files, use the hybrid approach.**
+
+### When to Use
+- Task requires > 5 files
+- Task expected to take > 10 minutes
+- Task has multiple independent components
+
+### Hybrid Approach
+1. **Analyze task** ? Break into phases and checkpoints
+2. **Identify dependencies** ? Which checkpoints are independent?
+3. **Parallel execution** ? Spawn agents for independent checkpoints
+4. **Sequential execution** ? Run dependent checkpoints in order
+5. **Track progress** ? Update after each checkpoint
+6. **Handle failures** ? Re-spawn agents that timeout (max 2 retries)
+7. **Cleanup** ? Kill agents after task completion
+
+### Progress Tracking
+- Update memory/task-orchestrator.json after each checkpoint
+- Update memory/checkpoint.json after each step
+- Log to memory/YYYY-MM-DD.md
+
+### Example Flow
+Phase 1 (Sequential): Prisma schema ? agent-prisma ? Complete ? Kill agent
+Phase 2 (Parallel): Auth middleware, Error handling, Validation ? 3 agents running
+Phase 3 (Sequential): Integration ? Wait for Phase 2, then spawn agent
+
+**Key Principle:** Jerry orchestrates, agents execute. Progress is tracked at every step.

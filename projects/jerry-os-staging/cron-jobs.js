@@ -25,8 +25,8 @@ cron.schedule('0 2 * * *', () => {
         .catch(() => notify('Nightly Backup', 'failed'));
 });
 
-// Self-improvement job - runs at 3:00 AM  
-cron.schedule('0 3 * * *', () => {
+// Self-improvement job - runs every hour
+cron.schedule('0 * * * *', () => {
     console.log('🔧 Starting overnight self-improvement...');
     notify('Self-Improvement Build', 'running');
     buildNewFeature()
@@ -55,14 +55,14 @@ cron.schedule('0 0 * * *', () => {
 async function backupWorkspace() {
     try {
         console.log('🔒 Backing up ENTIRE OpenClaw workspace (excluding secrets)...');
-        
+
         // Change to OpenClaw workspace root
         const workspaceRoot = path.join(process.env.HOME || process.env.USERPROFILE, '.openclaw', 'workspace');
         process.chdir(workspaceRoot);
-        
+
         // Add all changes in the entire workspace
         execSync('git add .', { stdio: 'inherit' });
-        
+
         // Remove any sensitive files that might have been added
         try {
             execSync('git reset -- .env || true', { stdio: 'inherit' });
@@ -76,7 +76,7 @@ async function backupWorkspace() {
         } catch (resetError) {
             console.log('No sensitive files to remove from staging');
         }
-        
+
         // Commit with timestamp
         const commitMessage = `OpenClaw Full Backup: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
         try {
@@ -85,19 +85,19 @@ async function backupWorkspace() {
             console.log('No changes to commit');
             return; // No need to push if no changes
         }
-        
+
         // Push to private GitHub repo
         console.log('📤 Pushing entire workspace to GitHub repository...');
         execSync('git push -u origin master', { stdio: 'inherit' });
-        
+
         console.log('✅ Full workspace backup completed successfully!');
-        
+
         // Return to original directory
         process.chdir(__dirname);
-        
+
     } catch (error) {
         console.error('❌ Full workspace backup failed:', error.message);
-        
+
         // Try to return to original directory even if backup failed
         try {
             process.chdir(__dirname);
@@ -110,30 +110,32 @@ async function backupWorkspace() {
 async function buildNewFeature() {
     try {
         console.log('🤖 Starting overnight self-improvement analysis...');
-        
+
         // Read and analyze user context
         const userContext = await analyzeUserContext();
         console.log('📊 Context analysis complete:', userContext.summary);
-        
+
         // Determine what feature to build based on patterns
         const featurePlan = await determineFeatureToBuild(userContext);
         console.log('🎯 Feature selected:', featurePlan.name);
-        
+
         // Build the actual feature
         const buildResult = await buildFeature(featurePlan);
-        
+
         if (buildResult.success) {
             console.log('✅ Self-improvement completed successfully!');
             console.log('📁 Built:', buildResult.featurePath);
-            
+
             // Update memory with what was built
             await updateImprovementMemory(featurePlan, buildResult);
-            
+    // Push successful improvements to production
+    await pushToProduction(featurePlan, buildResult);
+
         } else {
             console.log('⚠️ Self-improvement completed with partial success');
             console.log('💡 Learned:', buildResult.learnings);
         }
-        
+
     } catch (error) {
         console.error('❌ Self-improvement failed:', error.message);
         // Still log what we learned from the failure
@@ -149,7 +151,7 @@ async function analyzeUserContext() {
         featureRequests: [],
         summary: ''
     };
-    
+
     try {
         // Read USER.md to understand your preferences and needs
         const userPath = path.join(process.env.HOME || process.env.USERPROFILE, '.openclaw', 'workspace', 'USER.md');
@@ -157,30 +159,30 @@ async function analyzeUserContext() {
             const userContent = fs.readFileSync(userPath, 'utf8');
             context.userNeeds = extractNeedsFromUserMD(userContent);
         }
-        
+
         // Read recent memory files to understand usage patterns
         const memoryPath = path.join(process.env.HOME || process.env.USERPROFILE, '.openclaw', 'workspace', 'memory');
         if (fs.existsSync(memoryPath)) {
             const memoryFiles = fs.readdirSync(memoryPath).filter(f => f.endsWith('.md'));
             const recentMemories = memoryFiles.slice(-5); // Last 5 memory files
-            
+
             for (const file of recentMemories) {
                 const content = fs.readFileSync(path.join(memoryPath, file), 'utf8');
                 context.usagePatterns.push(...extractUsagePatterns(content));
                 context.painPoints.push(...extractPainPoints(content));
             }
         }
-        
+
         // Analyze feature requests from conversation patterns
         context.featureRequests = analyzeFeatureRequests(context.usagePatterns);
-        
+
         context.summary = `Analyzed ${context.userNeeds.length} user needs, ${context.painPoints.length} pain points, ${context.usagePatterns.length} usage patterns, and ${context.featureRequests.length} feature requests`;
-        
+
     } catch (error) {
         console.log('Context analysis partial:', error.message);
         context.summary = 'Partial context analysis due to read errors';
     }
-    
+
     return context;
 }
 
@@ -216,11 +218,11 @@ async function determineFeatureToBuild(userContext) {
             model: 'glm5'  // Using GLM5 for this feature
         }
     ];
-    
+
     // Sort by priority and select the highest
     featureIdeas.sort((a, b) => b.priority - a.priority);
     const selectedFeature = featureIdeas[0];
-    
+
     return {
         ...selectedFeature,
         priorityScore: selectedFeature.priority,
@@ -232,10 +234,10 @@ async function determineFeatureToBuild(userContext) {
 async function buildFeature(featurePlan) {
     try {
         console.log('🔨 Building feature:', featurePlan.name);
-        
+
         // Execute the build function
         const result = await featurePlan.buildFunction(featurePlan.context);
-        
+
         return {
             success: true,
             featurePath: result.path,
@@ -243,10 +245,10 @@ async function buildFeature(featurePlan) {
             buildTime: new Date().toISOString(),
             details: result
         };
-        
+
     } catch (error) {
         console.error('Feature build failed:', error.message);
-        
+
         return {
             success: false,
             error: error.message,
@@ -260,10 +262,10 @@ async function buildFeature(featurePlan) {
 async function buildEnhancedMemorySystem(context) {
     const fs = require('fs');
     const path = require('path');
-    
+
     try {
         console.log('🧠 Building Enhanced Memory System...');
-        
+
         // Create the enhanced memory system
         const memoryCode = `// Enhanced Memory System - Auto-generated by Self-Improvement
 // Built: ${new Date().toISOString()}
@@ -284,33 +286,33 @@ class EnhancedMemorySystem {
         if (!fs.existsSync(this.memoryPath)) {
             fs.mkdirSync(this.memoryPath, { recursive: true });
         }
-        
+
         // Initialize context retention system
         this.contextRetention = {
             maxContextLength: 10,
             retentionPeriod: 24 * 60 * 60 * 1000, // 24 hours
             contexts: new Map()
         };
-        
+
         console.log('✅ Enhanced Memory System initialized');
     }
 
     retainContext(sessionId, contextData) {
         const now = Date.now();
         const sessionContexts = this.contextRetention.contexts.get(sessionId) || [];
-        
+
         // Add new context
         sessionContexts.push({
             timestamp: now,
             data: contextData,
             expires: now + this.contextRetention.retentionPeriod
         });
-        
+
         // Trim to max length
         if (sessionContexts.length > this.contextRetention.maxContextLength) {
             sessionContexts.shift();
         }
-        
+
         this.contextRetention.contexts.set(sessionId, sessionContexts);
         return true;
     }
@@ -318,15 +320,15 @@ class EnhancedMemorySystem {
     recallContext(sessionId, maxAge = 3600000) {
         const now = Date.now();
         const sessionContexts = this.contextRetention.contexts.get(sessionId) || [];
-        
+
         // Filter by age and remove expired
-        const validContexts = sessionContexts.filter(ctx => 
+        const validContexts = sessionContexts.filter(ctx =>
             ctx.timestamp >= now - maxAge && ctx.timestamp <= now
         );
-        
+
         // Remove expired contexts
         this.contextRetention.contexts.set(sessionId, validContexts);
-        
+
         return validContexts.map(ctx => ctx.data);
     }
 
@@ -336,7 +338,7 @@ class EnhancedMemorySystem {
 **Importance:** \${importance}/5
 **Data:** \${JSON.stringify(data, null, 2)}
 \n\`;
-        
+
         try {
             await fs.promises.appendFile(memoryFile, entry);
             return true;
@@ -362,9 +364,9 @@ module.exports = EnhancedMemorySystem;
         // Write the actual file
         const filePath = path.join(__dirname, 'enhanced-memory-system.js');
         fs.writeFileSync(filePath, memoryCode);
-        
+
         console.log('✅ Enhanced Memory System built successfully!');
-        
+
         return {
             path: filePath,
             changes: [
@@ -376,7 +378,7 @@ module.exports = EnhancedMemorySystem;
             fileSize: memoryCode.length,
             lines: memoryCode.split('\n').length
         };
-        
+
     } catch (error) {
         console.error('❌ Failed to build Enhanced Memory System:', error);
         throw error;
@@ -386,16 +388,16 @@ module.exports = EnhancedMemorySystem;
 async function buildAutomationDashboard(context) {
     const fs = require('fs');
     const path = require('path');
-    
+
     try {
         console.log('📊 Building Automation Dashboard...');
-        
+
         // Create dashboard directory
         const dashboardPath = path.join(__dirname, 'automation-dashboard');
         if (!fs.existsSync(dashboardPath)) {
             fs.mkdirSync(dashboardPath, { recursive: true });
         }
-        
+
         // Create main dashboard file
         const dashboardCode = `// Automation Dashboard - Auto-generated by Self-Improvement
 // Built: ${new Date().toISOString()}
@@ -413,7 +415,7 @@ class AutomationDashboard {
     setupDashboard() {
         this.app.use(express.json());
         this.app.use(express.static(path.join(__dirname)));
-        
+
         // Dashboard routes
         this.app.get('/api/automations', (req, res) => {
             res.json({
@@ -421,18 +423,18 @@ class AutomationDashboard {
                 result: Array.from(this.automations.values())
             });
         });
-        
+
         this.app.post('/api/automations', (req, res) => {
             const automation = req.body;
             automation.id = Date.now().toString();
             automation.created = new Date().toISOString();
             automation.status = 'active';
-            
+
             this.automations.set(automation.id, automation);
-            
+
             res.json({ status: 'ok', result: automation });
         });
-        
+
         console.log('✅ Automation Dashboard initialized');
     }
 
@@ -453,7 +455,7 @@ class AutomationDashboard {
             lastRun: null,
             nextRun: this.calculateNextRun(schedule)
         };
-        
+
         this.automations.set(automation.id, automation);
         return automation;
     }
@@ -490,7 +492,7 @@ module.exports = AutomationDashboard;
             <h1>🤖 Automation Dashboard</h1>
             <p>Manage your automated tasks and workflows</p>
         </div>
-        
+
         <div class="automation-grid" id="automationGrid">
             <!-- Automations will be loaded here -->
         </div>
@@ -501,7 +503,7 @@ module.exports = AutomationDashboard;
             try {
                 const response = await fetch('/api/automations');
                 const data = await response.json();
-                
+
                 if (data.status === 'ok') {
                     renderAutomations(data.result);
                 }
@@ -525,7 +527,7 @@ module.exports = AutomationDashboard;
 
         // Load automations on page load
         loadAutomations();
-        
+
         // Refresh every 30 seconds
         setInterval(loadAutomations, 30000);
     </script>
@@ -535,12 +537,12 @@ module.exports = AutomationDashboard;
         // Write files
         const mainFile = path.join(dashboardPath, 'automation-dashboard.js');
         const htmlFile = path.join(dashboardPath, 'index.html');
-        
+
         fs.writeFileSync(mainFile, dashboardCode);
         fs.writeFileSync(htmlFile, htmlCode);
-        
+
         console.log('✅ Automation Dashboard built successfully!');
-        
+
         return {
             path: dashboardPath,
             changes: [
@@ -552,7 +554,7 @@ module.exports = AutomationDashboard;
             files: ['automation-dashboard.js', 'index.html'],
             totalSize: dashboardCode.length + htmlCode.length
         };
-        
+
     } catch (error) {
         console.error('❌ Failed to build Automation Dashboard:', error);
         throw error;
@@ -561,10 +563,10 @@ module.exports = AutomationDashboard;
 
 async function buildAPIImprovements(context) {
     const fs = require('fs');
-    
+
     try {
         console.log('🔌 Building API Improvements...');
-        
+
         const apiCode = `// API Improvements - Auto-generated by Self-Improvement
 // Built: ${new Date().toISOString()}
 
@@ -576,7 +578,7 @@ class APIImprovements {
             backoffFactor: 2,
             timeout: 10000
         };
-        
+
         this.errorHandlers = new Map();
         this.setupErrorHandling();
     }
@@ -586,7 +588,7 @@ class APIImprovements {
         this.registerErrorHandler('network', this.handleNetworkError.bind(this));
         this.registerErrorHandler('timeout', this.handleTimeoutError.bind(this));
         this.registerErrorHandler('validation', this.handleValidationError.bind(this));
-        
+
         console.log('✅ API Improvements initialized');
     }
 
@@ -597,38 +599,38 @@ class APIImprovements {
     async withRetry(apiCall, config = {}) {
         const finalConfig = { ...this.retryConfig, ...config };
         let lastError;
-        
+
         for (let attempt = 1; attempt <= finalConfig.maxRetries; attempt++) {
             try {
                 const result = await Promise.race([
                     apiCall(),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('timeout')), finalConfig.timeout)
                     )
                 ]);
-                
+
                 return result;
-                
+
             } catch (error) {
                 lastError = error;
-                
+
                 // Determine error type
                 const errorType = this.classifyError(error);
-                
+
                 // Apply specific error handler
                 const handler = this.errorHandlers.get(errorType) || this.defaultErrorHandler;
                 const shouldRetry = handler(error, attempt, finalConfig);
-                
+
                 if (!shouldRetry) {
                     break;
                 }
-                
+
                 // Wait before retry with exponential backoff
                 const delay = finalConfig.retryDelay * Math.pow(finalConfig.backoffFactor, attempt - 1);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
-        
+
         throw lastError;
     }
 
@@ -673,9 +675,9 @@ module.exports = APIImprovements;
 
         const filePath = path.join(__dirname, 'api-improvements.js');
         fs.writeFileSync(filePath, apiCode);
-        
+
         console.log('✅ API Improvements built successfully!');
-        
+
         return {
             path: filePath,
             changes: [
@@ -687,7 +689,7 @@ module.exports = APIImprovements;
             fileSize: apiCode.length,
             lines: apiCode.split('\n').length
         };
-        
+
     } catch (error) {
         console.error('❌ Failed to build API Improvements:', error);
         throw error;
@@ -697,16 +699,16 @@ module.exports = APIImprovements;
 async function buildUIEnhancements(context) {
     const fs = require('fs');
     const path = require('path');
-    
+
     try {
         console.log('🎨 Building UI Enhancements...');
-        
+
         // Create UI enhancements directory
         const uiPath = path.join(__dirname, 'ui-enhancements');
         if (!fs.existsSync(uiPath)) {
             fs.mkdirSync(uiPath, { recursive: true });
         }
-        
+
         // Create CSS enhancements
         const cssCode = `/* UI Enhancements - Auto-generated by Self-Improvement */
 /* Built: ${new Date().toISOString()} */
@@ -802,7 +804,7 @@ async function buildUIEnhancements(context) {
         flex-direction: column;
         gap: 4px;
     }
-    
+
     .enhanced-card {
         margin: 8px 0;
         padding: 16px;
@@ -834,12 +836,12 @@ class UIEnhancer {
     setupEnhancements() {
         // Auto-apply enhanced styles
         this.injectStyles();
-        
+
         // Enhance existing UI elements
         this.enhanceNavigation();
         this.enhanceCards();
         this.enhanceButtons();
-        
+
         console.log('✅ UI Enhancements applied');
     }
 
@@ -913,12 +915,12 @@ module.exports = UIEnhancer;
         // Write files
         const cssFile = path.join(uiPath, 'enhanced-styles.css');
         const jsFile = path.join(uiPath, 'ui-enhancer.js');
-        
+
         fs.writeFileSync(cssFile, cssCode);
         fs.writeFileSync(jsFile, jsCode);
-        
+
         console.log('✅ UI Enhancements built successfully!');
-        
+
         return {
             path: uiPath,
             changes: [
@@ -931,7 +933,7 @@ module.exports = UIEnhancer;
             files: ['enhanced-styles.css', 'ui-enhancer.js'],
             totalSize: cssCode.length + jsCode.length
         };
-        
+
     } catch (error) {
         console.error('❌ Failed to build UI Enhancements:', error);
         throw error;
@@ -942,88 +944,88 @@ module.exports = UIEnhancer;
 function extractNeedsFromUserMD(content) {
     const needs = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
         const lowerLine = line.toLowerCase();
-        
+
         // More sophisticated need detection
-        if (lowerLine.includes('i need') || 
-            lowerLine.includes('i want') || 
+        if (lowerLine.includes('i need') ||
+            lowerLine.includes('i want') ||
             lowerLine.includes('require') ||
             lowerLine.includes('would help') ||
             lowerLine.includes('could use') ||
             lowerLine.includes('looking for') ||
             (lowerLine.includes('better') && lowerLine.includes('would be')) ||
             lowerLine.includes('wish it could')) {
-            
+
             // Extract the actual need
             const needText = line.trim()
                 .replace(/^[-*]\s*/, '') // Remove bullet points
                 .replace(/^#+\s*/, '') // Remove headers
                 .trim();
-            
+
             if (needText.length > 10) { // Meaningful content
                 needs.push(needText);
             }
         }
     }
-    
+
     return needs.slice(0, 15); // Return top 15 needs
 }
 
 function extractUsagePatterns(content) {
     const patterns = [];
     const lines = content.split('\n');
-    
+
     for (const line of lines) {
         const trimmed = line.trim();
-        
+
         // Look for meaningful patterns
-        if (trimmed.length > 25 && 
-            !trimmed.startsWith('#') && 
+        if (trimmed.length > 25 &&
+            !trimmed.startsWith('#') &&
             !trimmed.startsWith('###') &&
             !trimmed.includes('```') &&
             trimmed.split(' ').length > 3) {
-            
+
             patterns.push(trimmed);
         }
     }
-    
+
     return patterns.slice(0, 20); // Return top 20 patterns
 }
 
 function extractPainPoints(content) {
     const painPoints = [];
     const lines = content.split('\n');
-    
+
     const painKeywords = [
-        'problem', 'issue', 'error', 'bug', 'fix', 'broken', 
+        'problem', 'issue', 'error', 'bug', 'fix', 'broken',
         'doesn\'t work', 'not working', 'trouble', 'difficult',
         'slow', 'crash', 'failed', 'stuck', 'blocked', 'frustrat',
         'annoying', 'complicated', 'hard to', 'challenge'
     ];
-    
+
     for (const line of lines) {
         const lowerLine = line.toLowerCase();
-        
+
         if (painKeywords.some(keyword => lowerLine.includes(keyword))) {
             const painText = line.trim()
                 .replace(/^[-*]\s*/, '')
                 .replace(/^#+\s*/, '')
                 .trim();
-            
+
             if (painText.length > 15) {
                 painPoints.push(painText);
             }
         }
     }
-    
+
     return painPoints.slice(0, 15); // Return top 15 pain points
 }
 
 function analyzeFeatureRequests(patterns) {
     const requests = [];
-    
+
     const requestPatterns = [
         'should have', 'would be great if', 'need to add',
         'wish it could', 'it would be nice', 'would love',
@@ -1031,15 +1033,15 @@ function analyzeFeatureRequests(patterns) {
         'could benefit from', 'would improve', 'would make',
         'would be better if', 'would be awesome', 'hoping for'
     ];
-    
+
     for (const pattern of patterns) {
         const lowerPattern = pattern.toLowerCase();
-        
+
         if (requestPatterns.some(req => lowerPattern.includes(req))) {
             requests.push(pattern);
         }
     }
-    
+
     return requests.slice(0, 10); // Return top 10 feature requests
 }
 
@@ -1056,16 +1058,16 @@ async function updateImprovementMemory(featurePlan, buildResult) {
 **Context:** ${featurePlan.context.summary}
 **Changes:** ${buildResult.success ? buildResult.changes.join(', ') : 'None'}
 \n`;
-    
+
     // Use correct path relative to workspace
     const memoryPath = path.join(__dirname, '../../memory', `self-improvement-${Date.now()}.md`);
-    
+
     // Ensure memory directory exists
     const memoryDir = path.dirname(memoryPath);
     if (!fs.existsSync(memoryDir)) {
         fs.mkdirSync(memoryDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(memoryPath, memoryEntry);
     console.log(`📝 Memory updated: ${memoryPath}`);
 }
@@ -1076,16 +1078,16 @@ async function logImprovementAttempt(error) {
 **Error:** ${error.message}
 **Stack:** ${error.stack || 'No stack trace'}
 \n`;
-    
+
     // Use correct path relative to workspace
     const logPath = path.join(__dirname, '../../memory', `improvement-failure-${Date.now()}.md`);
-    
+
     // Ensure memory directory exists
     const memoryDir = path.dirname(logPath);
     if (!fs.existsSync(memoryDir)) {
         fs.mkdirSync(memoryDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(logPath, logEntry);
     console.log(`📝 Failure logged: ${logPath}`);
 }
@@ -1093,11 +1095,11 @@ async function logImprovementAttempt(error) {
 async function generateDailyBrief() {
     try {
         console.log('📝 Generating daily brief with AI pulse...');
-        
+
         // This will be implemented to create daily briefs
         // For now, just log that it would run
         console.log('🗞️ Daily brief would be generated here');
-        
+
     } catch (error) {
         console.error('❌ Daily brief generation failed:', error.message);
     }
@@ -1106,11 +1108,11 @@ async function generateDailyBrief() {
 async function updateDocumentation() {
     try {
         console.log('📖 Analyzing system for documentation...');
-        
+
         // This will be implemented to update documentation
         // For now, just log that it would run
         console.log('📋 Documentation would be updated here');
-        
+
     } catch (error) {
         console.error('❌ Documentation update failed:', error.message);
     }
@@ -1123,3 +1125,39 @@ module.exports = {
     generateDailyBrief,
     updateDocumentation
 };
+// Push successful improvements to production
+async function pushToProduction(featurePlan, buildResult) {
+  try {
+    console.log('?? Pushing improvement to production...');
+    
+    const stagingPath = path.join(process.env.HOME || process.env.USERPROFILE, '.openclaw', 'workspace', 'projects', 'jerry-os-staging');
+    const productionPath = path.join(process.env.HOME || process.env.USERPROFILE, '.openclaw', 'workspace', 'projects', 'jerry-os');
+    
+    // Copy the built file to production if it exists
+    if (buildResult.featurePath && fs.existsSync(buildResult.featurePath)) {
+      const fileName = path.basename(buildResult.featurePath);
+      const destPath = path.join(productionPath, fileName);
+      
+      fs.copyFileSync(buildResult.featurePath, destPath);
+      console.log('? Copied to production:', fileName);
+      
+      // Commit to production
+      try {
+        process.chdir(productionPath);
+        execSync('git add .', { stdio: 'inherit' });
+        execSync('git commit -m "Auto-improvement: ' + featurePlan.name + ' - ' + new Date().toISOString() + '"', { stdio: 'inherit' });
+        console.log('? Committed to production git');
+      } catch (gitError) {
+        console.log('Git commit skipped (no changes or error)');
+      }
+      
+      process.chdir(stagingPath);
+    }
+    
+    console.log('? Push to production complete');
+    return { success: true };
+  } catch (error) {
+    console.error('? Push to production failed:', error.message);
+    return { success: false, error: error.message };
+  }
+}

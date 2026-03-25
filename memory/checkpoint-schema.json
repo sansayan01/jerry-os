@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Jerry Checkpoint System",
+  "description": "Schema for session continuity and task resumption",
+  "type": "object",
+  "required": ["version", "activeTask", "progress", "nextAction"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "activeTask": {
+      "type": "object",
+      "required": ["id", "name", "targetPath", "startedAt", "updatedAt"],
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "targetPath": {"type": "string"},
+        "startedAt": {"type": "string", "format": "date-time"},
+        "updatedAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "progress": {
+      "type": "object",
+      "required": ["phase", "percentComplete", "completedSteps", "pendingSteps", "currentStep"],
+      "properties": {
+        "phase": {"type": "string"},
+        "phaseDescription": {"type": "string"},
+        "percentComplete": {"type": "number", "minimum": 0, "maximum": 100},
+        "completedSteps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "timestamp": {"type": "string", "format": "date-time"}
+            }
+          }
+        },
+        "currentStep": {
+          "type": "object",
+          "required": ["id", "name", "status"],
+          "properties": {
+            "id": {"type": "string"},
+            "name": {"type": "string"},
+            "status": {"type": "string", "enum": ["not_started", "in_progress", "blocked", "completed"]},
+            "startedAt": {"type": "string", "format": "date-time"},
+            "notes": {"type": "string"}
+          }
+        },
+        "pendingSteps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "description": {"type": "string"},
+          "reportedAt": {"type": "string", "format": "date-time"},
+          "needsUserInput": {"type": "boolean"}
+        }
+      }
+    },
+    "nextAction": {
+      "type": "string",
+      "description": "Exact next action to take when resuming"
+    },
+    "delegations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agentId": {"type": "string"},
+          "task": {"type": "string"},
+          "startedAt": {"type": "string", "format": "date-time"},
+          "status": {"type": "string", "enum": ["running", "completed", "failed", "timeout"]},
+          "result": {"type": "string"}
+        }
+      }
+    },
+    "heartbeats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {"type": "string", "format": "date-time"},
+          "action": {"type": "string"}
+        }
+      }
+    }
+  }
+}
