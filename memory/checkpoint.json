@@ -2,51 +2,41 @@
   "$schema": "./checkpoint-schema.json",
   "version": "1.0",
   "activeTask": {
-    "id": "axiom-pro-enterprise",
-    "name": "AXIOM PRO Enterprise Transformation",
-    "description": "Transform single-file todo app into multi-tenant SaaS",
-    "targetPath": "D:\\Sayan\\Projects\\todo",
-    "startedAt": "2026-03-24T22:36:00+05:30",
-    "updatedAt": "2026-03-25T09:55:00+05:30"
+    "id": "hisaab-fatafat-invoice-page",
+    "name": "Hisaab Fatafat Invoice Page - Swipe Style",
+    "description": "Implement Swipe-style invoice list page with full functionality",
+    "targetPath": "D:\\Sayan\\Projects\\Hisaab_Fatafat_2",
+    "startedAt": "2026-04-04T04:08:00+05:30",
+    "updatedAt": "2026-04-04T05:22:00+05:30"
   },
   "progress": {
-    "phase": "frontend-setup",
-    "phaseDescription": "Setting up backend infrastructure",
-    "percentComplete": 50,
+    "phase": "implementation",
+    "phaseDescription": "Implementing invoice page with Swipe-style UI",
+    "percentComplete": 85,
     "completedSteps": [
-      {"id": "analyze", "name": "Analyzed current index.html", "timestamp": "2026-03-24T22:40:00+05:30"},
-      {"id": "structure", "name": "Created project structure", "timestamp": "2026-03-24T22:45:00+05:30"},
-      {"id": "package", "name": "Created backend/package.json", "timestamp": "2026-03-24T22:50:00+05:30"},
-      {"id": "env", "name": "Created backend/.env.example", "timestamp": "2026-03-24T23:00:00+05:30"},
-      {"id": "prisma-schema", "name": "Created Prisma schema (comprehensive)", "timestamp": "2026-03-25T10:20:00+05:30"},
-      {"id": "express-server", "name": "Created Express server entry point", "timestamp": "2026-03-25T10:20:00+05:30"},
-      {"id": "auth-middleware", "name": "Created auth middleware (auth.js, errorHandler.js, validate.js)", "timestamp": "2026-03-25T10:35:00+05:30"},
-      {"id": "api-routes", "name": "Created API routes (auth, users, teams, workspaces, tasks, comments, notifications)", "timestamp": "2026-03-25T11:15:00+05:30"},
-      {"id": "remaining-backend", "name": "Completed backend files (analytics, passport config, socket)", "timestamp": "2026-03-25T12:37:00+05:30"}
+      {"id": "install-composer", "name": "Installed Composer and PHP dependencies", "timestamp": "2026-04-04T04:18:00+05:30"},
+      {"id": "setup-sqlite", "name": "Set up SQLite database for development", "timestamp": "2026-04-04T05:20:00+05:30"},
+      {"id": "update-frontend", "name": "Updated InvoiceList.jsx with Swipe-style UI", "timestamp": "2026-04-04T04:46:00+05:30"},
+      {"id": "update-backend-controller", "name": "Updated InvoiceController with search, filter, sort, summary", "timestamp": "2026-04-04T05:12:00+05:30"},
+      {"id": "update-invoice-model", "name": "Added new fields to Invoice model", "timestamp": "2026-04-04T05:12:00+05:30"}
     ],
     "currentStep": {
-      "id": "frontend-structure",
-      "name": "Setting up frontend React+TypeScript structure",
+      "id": "verify-functions",
+      "name": "Verify all functions work (search, filter, sort)",
       "status": "in_progress",
-      "startedAt": "2026-03-25T13:07:00+05:30",
-      "notes": "Creating React app structure, config, and initial components"
+      "startedAt": "2026-04-04T05:22:00+05:30",
+      "notes": "Frontend and backend running. Need to verify functionality and fix any SQLite column issues."
     },
     "pendingSteps": [
-      {"id": "express-server", "name": "Setting up Express server"},
-      {"id": "auth-jwt", "name": "JWT authentication system"},
-      {"id": "auth-oauth", "name": "OAuth integration (Google/Microsoft)"},
-      {"id": "api-users", "name": "API routes for users"},
-      {"id": "api-teams", "name": "API routes for teams"},
-      {"id": "api-tasks", "name": "API routes for tasks"},
-      {"id": "api-workspaces", "name": "API routes for workspaces"},
-      {"id": "websocket", "name": "WebSocket real-time sync"},
-      {"id": "frontend-refactor", "name": "Frontend refactor to React+TypeScript"},
-      {"id": "admin-dashboard", "name": "Admin dashboard"},
-      {"id": "docs", "name": "Documentation"}
+      {"id": "add-database-columns", "name": "Add reference, shipping_bill_number, shipping_bill_date, shipping_port_code columns to invoices table"},
+      {"id": "test-api-endpoint", "name": "Test /api/invoices endpoint with all parameters"},
+      {"id": "verify-ui-interactions", "name": "Verify tab filtering, search, sorting work in UI"}
     ]
   },
   "blockers": [],
-  "nextAction": "Set up frontend React+TypeScript structure and integrate with backend",
+  "nextAction": "Fix SQLite column addition and verify API works with new fields",
   "delegations": [],
-  "heartbeats": []
+  "heartbeats": [
+    {"timestamp": "2026-04-04T05:23:00+05:30", "action": "UPDATED_CHECKPOINT", "notes": "Added Hisaab Fatafat invoice page task to checkpoint. Work in progress."}
+  ]
 }

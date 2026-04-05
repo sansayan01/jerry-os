@@ -1499,6 +1499,8 @@ class JerryOS {
     }
 
     async loadMissionControlData() {
+        const timerEl = document.getElementById('mc-refresh-timer');
+        if (timerEl) timerEl.classList.add('refreshing');
 
         try {
             await Promise.all([
@@ -1511,28 +1513,37 @@ class JerryOS {
         } catch (error) {
             console.error('Mission Control load failed:', error);
             return false;
+        } finally {
+            if (timerEl) {
+                setTimeout(() => timerEl.classList.remove('refreshing'), 500);
+            }
         }
     }
 
     async loadModelInfo() {
+        const container = document.getElementById('mc-models-row');
+        if (container) {
+            container.innerHTML = '<div class="mc-model-card shimmer"><div class="mc-model-name">Loading...</div></div>';
+        }
+
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             
             const response = await fetch('/api/model', { signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await response.json();
             
-            if (data.status === 'ok' && data.result.models) {
+            if (data.status === 'ok' && data.result && data.result.models) {
                 this.availableModels = data.result.models.map(m => m.name);
                 this.renderModelCards(data.result.models);
             } else {
                 this.availableModels = [];
-                this.renderModelCards([]);
+                this.renderModelError();
             }
         } catch (error) {
             console.log('Failed to fetch model data:', error);
-            this.renderModelCards([]);
+            this.renderModelError();
         }
     }
 
@@ -1545,38 +1556,52 @@ class JerryOS {
             return;
         }
 
-        container.innerHTML = models.map(model => `
+        container.innerHTML = models.map(model => {
+            const statusClass = model.status === 'online' ? 'online' : model.status === 'standby' ? 'standby' : 'offline';
+            const statusLabel = model.status || 'unknown';
+            return `
             <div class="mc-model-card animate-in">
                 <div class="mc-model-top">
-                    <div class="mc-model-name">${model.name}</div>
-                    <div class="mc-model-status ${model.status}">
+                    <div class="mc-model-name">${this.escapeHtml(model.name)}</div>
+                    <div class="mc-model-status ${statusClass}">
                         <span class="mc-status-dot"></span>
-                        ${model.status}
+                        ${statusLabel}
                     </div>
                 </div>
-                <div class="mc-model-provider">${model.provider}</div>
+                <div class="mc-model-provider">${this.escapeHtml(model.provider)}</div>
                 ${!model.configured ? '<div class="mc-model-config">Not configured</div>' : ''}
             </div>
-        `).join('');
+        `}).join('');
+    }
+
+    renderModelError() {
+        const container = document.getElementById('mc-models-row');
+        if (!container) return;
+        container.innerHTML = '<div class="mc-no-data">Data unavailable - retrying...</div>';
     }
 
     async loadActiveSessions() {
+        const container = document.getElementById('mc-sessions');
+        if (container) {
+            container.innerHTML = '<div class="mc-model-card shimmer"><div class="mc-model-name">Loading sessions...</div></div>';
+        }
+
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             
             const response = await fetch('/api/sessions', { signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await response.json();
             
-            if (data.status === 'ok' && data.result.sessions) {
+            if (data.status === 'ok' && data.result && data.result.sessions) {
                 this.renderSessionCards(data.result.sessions);
             } else {
-                this.renderSessionCards([]);
+                this.renderSessionError();
             }
         } catch (error) {
             console.log('Failed to fetch sessions:', error);
-            this.renderSessionCards([]);
+            this.renderSessionError();
         }
     }
 
@@ -1592,22 +1617,22 @@ class JerryOS {
         }
 
         container.innerHTML = activeSessions.map(session => {
-            const timeAgo = this.getTimeAgo(session.updated);
+            const timeAgo = session.updated || this.getTimeAgo(session.updated);
             return `
                 <div class="mc-session-card">
                     <div class="mc-session-top">
-                        <div class="mc-session-name">${session.label || session.id}</div>
+                        <div class="mc-session-name">${this.escapeHtml(session.label || session.id)}</div>
                         <div class="mc-session-badge">
                             <span class="mc-session-dot"></span>
                             ${session.active ? 'active' : 'idle'}
                         </div>
                     </div>
                     <div class="mc-session-details">
-                        ${session.agent ? `<div class="mc-session-detail">${session.agent}</div>` : ''}
-                        ${session.channel ? `<div class="mc-session-detail">Channel: ${session.channel}</div>` : ''}
+                        ${session.agent ? `<div class="mc-session-detail">${this.escapeHtml(session.agent)}</div>` : ''}
+                        ${session.channel ? `<div class="mc-session-detail">Channel: ${this.escapeHtml(session.channel)}</div>` : ''}
                     </div>
                     <div class="mc-session-footer">
-                        <div class="mc-session-model">${session.model || '—'}</div>
+                        <div class="mc-session-model">${this.escapeHtml(session.model || '—')}</div>
                         <div class="mc-session-tokens">
                             <span class="token-count">${session.tokens || '—'}</span> tokens
                             <br>${timeAgo}
@@ -1616,6 +1641,12 @@ class JerryOS {
                 </div>
             `;
         }).join('');
+    }
+
+    renderSessionError() {
+        const container = document.getElementById('mc-sessions');
+        if (!container) return;
+        container.innerHTML = '<div class="mc-no-data">Data unavailable - retrying...</div>';
     }
 
     getTimeAgo(timestamp) {
@@ -1635,22 +1666,27 @@ class JerryOS {
     }
 
     async loadCronHealth() {
+        const tbody = document.getElementById('mc-cron-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="mc-no-data">Loading cron data...</td></tr>';
+        }
+
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             
             const response = await fetch('/api/crons', { signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await response.json();
             
-            if (data.status === 'ok') {
+            if (data.status === 'ok' && data.result) {
                 this.renderCronTable(data.result);
             } else {
-                this.renderCronTable([]);
+                this.renderCronError();
             }
         } catch (error) {
             console.log('Failed to fetch cron data:', error);
-            this.renderCronTable([]);
+            this.renderCronError();
         }
     }
 
@@ -1663,16 +1699,24 @@ class JerryOS {
             return;
         }
 
-        tbody.innerHTML = cronData.map(cron => `
+        tbody.innerHTML = cronData.map(cron => {
+            const statusClass = cron.status === 'running' ? 'cron-running' : cron.status === 'healthy' ? 'cron-healthy' : cron.status === 'failed' ? 'cron-failed' : 'cron-idle';
+            return `
             <tr>
-                <td class="cron-name-cell">${cron.name || 'Unnamed'}</td>
-                <td class="cron-schedule-cell">${cron.schedule || '—'}</td>
+                <td class="cron-name-cell">${this.escapeHtml(cron.name || 'Unnamed')}</td>
+                <td class="cron-schedule-cell">${this.escapeHtml(cron.schedule || '—')}</td>
                 <td class="${cron.enabled ? 'cron-enabled-yes' : 'cron-enabled-no'}">${cron.enabled ? 'Yes' : 'No'}</td>
-                <td class="cron-dash">${cron.lastRun || '—'}</td>
-                <td class="cron-dash">${cron.status || '—'}</td>
-                <td>${cron.nextRun || '—'}</td>
+                <td class="cron-dash">${this.escapeHtml(cron.lastRun || '—')}</td>
+                <td><span class="cron-status-badge ${statusClass}">${this.escapeHtml(cron.status || '—')}</span></td>
+                <td>${this.escapeHtml(cron.nextRun || '—')}</td>
             </tr>
-        `).join('');
+        `}).join('');
+    }
+
+    renderCronError() {
+        const tbody = document.getElementById('mc-cron-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="6" class="mc-no-data">Data unavailable - retrying...</td></tr>';
     }
 
     // ═══════════════════════════════════════════════
@@ -1779,10 +1823,22 @@ class LabManager {
             if (data.status === 'ok') {
                 this.data = data.result;
                 this.renderDashboard();
+            } else {
+                this.renderLabError();
             }
         } catch (error) {
             console.error('Failed to load lab data:', error);
+            this.renderLabError();
         }
+    }
+
+    renderLabError() {
+        const uptime = document.getElementById('lab-uptime');
+        const latency = document.getElementById('lab-latency');
+        const requests = document.getElementById('lab-requests');
+        if (uptime) uptime.textContent = 'Data unavailable';
+        if (latency) latency.textContent = 'Data unavailable';
+        if (requests) requests.textContent = 'Data unavailable';
     }
 
     renderDashboard() {

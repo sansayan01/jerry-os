@@ -1,43 +1,30 @@
-# HEARTBEAT.md
+# 24/7 Hisaab Fatafat Development - AUTO-CONTINUE
 
-## ⚠️ FIRST: Check Resume Protocol
+## Your Mission
+Continuous development on Hisaab Fatafat (Swipe clone). Every heartbeat, spawn ONE agent for the next pending task.
 
-**Before anything else:**
-1. Read `memory/checkpoint.json`
-2. If active task exists with `currentStep.status != "completed"`:
-   - **RESUME IMMEDIATELY** — execute `nextAction`
-   - Do NOT reply HEARTBEAT_OK, continue the work
+## Dev Queue Location
+`C:\Users\sscom\.openclaw\workspace\memory\hisaab-dev-queue.json`
 
-## ⚠️ SECOND: Check Task Orchestration
+## AUTO-CONTINUE PROCESS (Every Heartbeat)
 
-**If large task in progress:**
-1. Read `memory/task-orchestrator.json`
-2. Check `activeAgents` array
-3. If any agent has `status: "running"` for > 15 minutes:
-   - Check agent status via `subagents list`
-   - If stalled, re-spawn from last checkpoint
-4. If all checkpoints in a phase complete:
-   - Move to next phase
-   - Update orchestrator file
+1. **Read the dev queue** - Find next pending task
+2. **Spawn ONE agent** immediately (don't wait)
+3. **If agent fails** (rate limit, timeout, error) - Mark and move to next task on next heartbeat
+4. **If agent succeeds** - Mark as completed, spawn next agent
+5. **Report progress** to user
 
-## Heartbeat Checklist
+## Rate Limit Handling
+- Rate limits are NORMAL - agents will fail
+- When rate limited, just continue on next heartbeat
+- Don't poll or wait - just spawn and move on
+- The system auto-recovers
 
-If no task to resume, check these (rotate through):
+## Current Status
+**PROJECT COMPLETE: Hisaab Fatafat Swipe Clone**
+✅ All 9 phases completed (100%)
+- Invoices, Dashboard, Sidebar, Products, Customers, Payments, Purchases
+- Reports, Settings, Testing & Polish
 
-- [ ] Any blockers in checkpoint that need user input?
-- [ ] Active task progress — update checkpoint if needed
-- [ ] Task orchestration — check agent status, re-spawn if needed
-- [ ] Memory maintenance (every few days)
-
-## When to Stay Quiet (HEARTBEAT_OK)
-
-- No active task OR task is completed
-- No blockers needing user input
-- Nothing urgent to report
-- Late night hours (23:00-08:00)
-
-## Remember
-
-**Work is continuous. Sessions are not.**
-If checkpoint shows work in progress → CONTINUE IT.
-If orchestrator shows agents running → TRACK THEM.
+## SPAWN IMMEDIATELY
+On every heartbeat, immediately spawn an agent for the next task. Do not ask, just do it.

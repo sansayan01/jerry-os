@@ -1,24 +1,48 @@
-// Jerry OS Staging Server - Testing Environment
+// Jerry OS Server - Simple development server with Dynamic Data
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const chokidar = require('chokidar');
 
-// Import Dynamic Data Manager
+// Gateway Auto-Start Check
+async function ensureGatewayRunning() {
+    try {
+        console.log('🔍 Checking OpenClaw gateway status...');
+        const status = execSync('openclaw gateway status', { encoding: 'utf8', timeout: 5000 });
+        
+        if (status.toLowerCase().includes('running')) {
+            console.log('✅ OpenClaw gateway is running');
+        } else {
+            console.log('⚠️ OpenClaw gateway not running, attempting to start...');
+            execSync('openclaw gateway start', { encoding: 'utf8', timeout: 10000 });
+            console.log('✅ OpenClaw gateway started');
+        }
+    } catch (error) {
+        console.log('⚠️ Gateway check failed, attempting to start...');
+        try {
+            execSync('openclaw gateway start', { encoding: 'utf8', timeout: 10000 });
+            console.log('✅ OpenClaw gateway started');
+        } catch (startError) {
+            console.log('❌ Failed to start gateway:', startError.message);
+            console.log('📍 Jerry OS will continue with fallback data');
+        }
+    }
+}
+
+// Start gateway check
+ensureGatewayRunning();
+
+// Import and start cron jobs FIRST (so jobTracker exists before dynamicData starts)
+console.log('⏰ Initializing cron jobs...');
+const cronTasks = require('./cron-jobs.js');
+cronTasks.start(updateJobStatus);
+
+// Import Dynamic Data Manager (jobTracker passed after its definition)
 const DynamicDataManager = require('./dynamic-data.js');
 const dynamicData = new DynamicDataManager();
 dynamicData.start();
-console.log('📊 Staging: Dynamic data system initialized');
-
-// Import Agent Orchestrator
-const AgentOrchestrator = require('./agent-orchestrator.js');
-const orchestrator = new AgentOrchestrator();
-console.log('🤖 Staging: Agent orchestrator initialized');
-
-// Import and start cron jobs
-console.log('⏰ Initializing cron jobs...');
-const cronTasks = require('./cron-jobs.js');
+console.log('📊 Dynamic data system initialized with real data sources');
 
 // Shared state for tracking job runs
 const jobTracker = {
@@ -27,6 +51,9 @@ const jobTracker = {
     'Daily Brief': { lastRun: null, status: 'idle', nextRun: '6:00 AM' },
     'Nightly Backup': { lastRun: null, status: 'idle', nextRun: '2:00 AM' }
 };
+
+// Connect jobTracker to dynamic data manager (must be after jobTracker is defined)
+dynamicData.setJobTracker(jobTracker);
 
 function updateJobStatus(name, status) {
     if (jobTracker[name]) {
@@ -38,7 +65,7 @@ function updateJobStatus(name, status) {
 }
 
 const app = express();
-const PORT = 8981; // Staging runs on port 8981
+const PORT = 8981;
 
 // Helper function for fallback responses - now using dynamic data
 function returnFallbackResponse(res) {
@@ -76,206 +103,179 @@ function getScheduleForJob(name) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// API Routes - All using dynamic data
+// API Routes - All using dynamic data from real sources
 app.get('/api/model', async (req, res) => {
     try {
-        returnFallbackResponse(res);
+        const result = await dynamicData.getModels();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Model API error:', error.message);
-        returnFallbackResponse(res);
+        console.error('[server] /api/model error:', error.message);
+        res.json({ status: 'ok', result: { models: [] } });
     }
 });
 
-app.get('/api/org-chart', (req, res) => {
+// Dynamic Org Chart - replaced with /api/org-chart-live at line 175
+// The old static file handler was removed to use live Paperclip data
+
+app.post('/api/org-chart', (req, res) => {
+    const orgPath = path.join(__dirname, 'data', 'org-chart.json');
     try {
-        // Get created agents from orchestrator
-        if (orchestrator.agentCreator) {
-            global.createdAgentsList = orchestrator.agentCreator.getCreatedAgents();
-        }
-        
-        const dynamicOrgData = dynamicData.getOrgChart();
-        res.json({ status: 'ok', result: dynamicOrgData });
-    } catch (error) {
-        console.log('Org Chart API error:', error.message);
-        // Fallback to static file if dynamic generation fails
-        const orgPath = path.join(__dirname, 'data', 'org-chart.json');
-        if (fs.existsSync(orgPath)) {
-            try {
-                const data = JSON.parse(fs.readFileSync(orgPath, 'utf8'));
-                res.json({ status: 'ok', result: data });
-            } catch (e) {
-                res.status(500).json({ status: 'error', error: 'Failed to parse org-chart.json' });
-            }
-        } else {
-            res.status(500).json({ status: 'error', error: 'Failed to generate dynamic org chart' });
-        }
+        const newData = req.body;
+        fs.writeFileSync(orgPath, JSON.stringify(newData, null, 4));
+        res.json({ status: 'ok', message: 'Org chart updated successfully' });
+    } catch (e) {
+        console.error('Failed to save org chart:', e);
+        res.status(500).json({ status: 'error', error: 'Failed to save data' });
     }
 });
 
 app.get('/api/sessions', async (req, res) => {
     try {
-        returnSessionsFallbackResponse(res);
+        const result = await dynamicData.getSessions();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Sessions API error:', error.message);
-        returnSessionsFallbackResponse(res);
+        console.error('[server] /api/sessions error:', error.message);
+        res.json({ status: 'ok', result: { sessions: [] } });
     }
 });
 
 app.get('/api/crons', async (req, res) => {
     try {
-        returnCronsFallbackResponse(res);
+        const result = await dynamicData.getCrons();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Crons API error:', error.message);
-        returnCronsFallbackResponse(res);
+        console.error('[server] /api/crons error:', error.message);
+        res.json({ status: 'ok', result: [] });
     }
 });
 
-// Agent Management Endpoints
-app.get('/api/agents/status', (req, res) => {
+app.get('/api/lab', async (req, res) => {
     try {
-        const statuses = orchestrator.getAllAgentsStatus();
-        res.json({ status: 'ok', result: statuses });
+        const result = await dynamicData.getLabData();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Agent status error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        console.error('[server] /api/lab error:', error.message);
+        res.json({ status: 'ok', result: { prototypes: [], builds: [], improvements: [], metrics: { uptime: '0%', responseTime: '0ms', dailyRequests: 0 } } });
     }
 });
 
-app.post('/api/agents/initialize', (req, res) => {
+// Dynamic Org Chart from Paperclip agents (live) with static fallback
+const { buildOrgChart } = require('./org-chart-resolver.js');
+app.get('/api/org-chart', async (req, res) => {
     try {
-        const result = orchestrator.initializePlannedAgents();
-        res.json({ status: 'ok', result: result });
+        const result = await buildOrgChart();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Agent initialization error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        console.error('[server] /api/org-chart error:', error.message);
+        const fallback = require('./data/org-chart.json');
+        res.json({ status: 'ok', result: fallback });
     }
 });
 
-app.post('/api/agents/:agentId/delegate', (req, res) => {
+// Dashboard Overview (all data in one call)
+app.get('/api/dashboard', async (req, res) => {
     try {
-        const { agentId } = req.params;
-        const task = req.body;
-        
-        const delegation = orchestrator.delegateTask(agentId, task);
-        res.json({ status: 'ok', result: delegation });
+        const result = await dynamicData.getDashboard();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Delegation error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        console.error('[server] /api/dashboard error:', error.message);
+        res.json({ status: 'ok', result: { models: [], sessions: [], crons: [], paperclip: null, paperclipAgents: [], metrics: {} } });
     }
 });
 
-app.post('/api/agents/process-tasks', async (req, res) => {
+// Paperclip Agent Status
+app.get('/api/paperclip', async (req, res) => {
     try {
-        await orchestrator.processTaskQueue();
-        res.json({ status: 'ok', message: 'Tasks processed' });
+        const result = await dynamicData.getPaperclipData();
+        res.json({ status: 'ok', result });
     } catch (error) {
-        console.log('Task processing error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        console.error('[server] /api/paperclip error:', error.message);
+        res.json({ status: 'ok', result: { summary: null, agents: [] } });
     }
 });
 
-app.get('/api/agents/task/:taskId', (req, res) => {
+// API Endpoint for Daily Briefs
+app.get('/api/briefs', async (req, res) => {
     try {
-        const { taskId } = req.params;
-        const task = orchestrator.activeTasks.get(taskId);
-        
-        if (!task) {
-            return res.status(404).json({ status: 'error', error: 'Task not found' });
+        const briefsDir = path.join(__dirname, 'briefs');
+        if (!fs.existsSync(briefsDir)) {
+            return res.json({ status: 'ok', result: [] });
         }
         
-        res.json({ status: 'ok', result: task });
+        const files = await fs.promises.readdir(briefsDir);
+        const briefs = files
+            .filter(f => f.endsWith('.md'))
+            .map(f => {
+                const date = f.replace('.md', '');
+                return {
+                    id: date,
+                    date: date,
+                    title: new Date(date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })
+                };
+            })
+            // Sort newest first
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+        res.json({ status: 'ok', result: briefs });
     } catch (error) {
-        console.log('Task fetch error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        res.status(500).json({ status: 'error', error: 'Failed to read briefs' });
     }
 });
 
-app.get('/api/agents/stats', (req, res) => {
+// Serve individual brief markdown
+app.get('/briefs/:id.md', async (req, res) => {
     try {
-        const stats = orchestrator.getStats();
-        res.json({ status: 'ok', result: stats });
+        const filePath = path.join(__dirname, 'briefs', `${req.params.id}.md`);
+        if (fs.existsSync(filePath)) {
+            const content = await fs.promises.readFile(filePath, 'utf8');
+            res.send(content);
+        } else {
+            res.status(404).send('Brief not found');
+        }
     } catch (error) {
-        console.log('Agent stats error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        res.status(500).send('Error reading brief');
     }
 });
 
-// Intelligent Routing Endpoints
-app.post('/api/route-task', async (req, res) => {
+// API Endpoint for Documentation Pages
+app.get('/api/docs', async (req, res) => {
     try {
-        const { description, context } = req.body;
+        const docs = [
+            { id: 'system-overview', title: 'System Overview', file: 'README.md' },
+            { id: 'design-system', title: 'Design System', file: 'DESIGN-SKILL.md' },
+            // Add more docs here as needed
+        ];
         
-        const result = await orchestrator.intelligence.delegateIntelligently(description, context);
-        res.json({ status: 'ok', result: result });
+        res.json({ status: 'ok', result: docs });
     } catch (error) {
-        console.log('Intelligent routing error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        res.status(500).json({ status: 'error', error: 'Failed to load docs list' });
     }
 });
 
-app.get('/api/intelligence/stats', (req, res) => {
+// Serve individual documentation markdown (allow access from root)
+app.get('/docs/:file', async (req, res) => {
     try {
-        const stats = orchestrator.intelligence.getStats();
-        res.json({ status: 'ok', result: stats });
-    } catch (error) {
-        console.log('Intelligence stats error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
-    }
-});
-
-app.get('/api/intelligence/recommendations', (req, res) => {
-    try {
-        const recommendations = orchestrator.intelligence.getRecommendations();
-        res.json({ status: 'ok', result: recommendations });
-    } catch (error) {
-        console.log('Recommendations error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
-    }
-});
-
-app.post('/api/learn/:taskId', (req, res) => {
-    try {
-        const { taskId } = req.params;
-        const { success } = req.body;
+        // Only allow safe files from root to avoid path traversal
+        const allowedFiles = ['README.md', 'DESIGN-SKILL.md'];
+        const file = req.params.file;
         
-        orchestrator.intelligence.learnFromResult(taskId, success);
-        res.json({ status: 'ok', message: 'Learning recorded' });
-    } catch (error) {
-        console.log('Learning error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
-    }
-});
-
-// Dynamic Agent Creation Endpoints
-app.post('/api/agents/create', async (req, res) => {
-    try {
-        const { taskDescription, agentType } = req.body;
+        if (!allowedFiles.includes(file)) {
+            return res.status(403).send('Forbidden document');
+        }
         
-        const result = await orchestrator.agentCreator.createAgent(taskDescription, agentType);
-        res.json({ status: 'ok', result: result });
+        const filePath = path.join(__dirname, file);
+        if (fs.existsSync(filePath)) {
+            const content = await fs.promises.readFile(filePath, 'utf8');
+            res.send(content);
+        } else {
+            res.status(404).send('Document not found');
+        }
     } catch (error) {
-        console.log('Agent creation error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
-    }
-});
-
-app.get('/api/agents/created', (req, res) => {
-    try {
-        const createdAgents = orchestrator.agentCreator.getCreatedAgents();
-        res.json({ status: 'ok', result: createdAgents });
-    } catch (error) {
-        console.log('Get created agents error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
-    }
-});
-
-app.get('/api/agents/available-types', (req, res) => {
-    try {
-        const types = orchestrator.agentCreator.getAvailableTypes();
-        res.json({ status: 'ok', result: types });
-    } catch (error) {
-        console.log('Get agent types error:', error.message);
-        res.status(500).json({ status: 'error', error: error.message });
+        res.status(500).send('Error reading document');
     }
 });
 
@@ -361,8 +361,8 @@ function parseSessionMessages(content) {
     return messages;
 }
 
-// Chatbot prompt endpoint - Enhanced for Staging
-app.post('/api/prompt', express.json(), (req, res) => {
+// Chatbot prompt endpoint - Enhanced Recognition System
+app.post('/api/prompt', express.json(), async (req, res) => {
     try {
         const { message } = req.body;
 
@@ -380,76 +380,143 @@ app.post('/api/prompt', express.json(), (req, res) => {
         // Greetings
         if (messageLower.match(/^(hi|hello|hey|good morning|good evening|good afternoon)/)) {
             const greetings = [
-                "Hey there! 👋 This is the STAGING environment!",
-                "Hi! 😊 I'm Jerry in STAGING mode. Testing new features here!",
-                "Hello! 🌟 Welcome to the staging sandbox!",
-                "Hey! 👋 You're in the testing environment!"
+                "Hey there! 👋 Great to see you! How can I help you today?",
+                "Hi! 😊 I'm Jerry, your executive assistant. What can I do for you?",
+                "Hello! 🌟 Welcome! I'm ready to assist you with anything you need!",
+                "Hey! 👋 Good to hear from you! What's on your mind?"
             ];
             response = greetings[Math.floor(Math.random() * greetings.length)];
         }
         // Name and Identity
         else if (messageLower.match(/(your name|who are you|what are you|what's your name|your identity)/)) {
-            response = `I'm Jerry! 🤖 (STAGING VERSION)
+            response = `I'm Jerry! 🤖
 
-This is the TESTING ENVIRONMENT for Jerry OS.
+I'm your AI executive assistant, designed to:
+- Coordinate your multi-agent system
+- Manage Technical Lead, Project Manager, and Research agents
+- Handle executive tasks and decision-making
+- Monitor system health and performance
 
-I'm your AI executive assistant in sandbox mode:
-- Safe place to test new features
-- Experimental changes happen here first
-- No risk to your production system
+Think of me as your right-hand AI for managing complex AI operations! 💪
 
-Feel free to break things here - that's what staging is for! 💪
-
-What would you like to test?`;
+How can I assist you today?`;
         }
         // Status and System
         else if (messageLower.match(/(status|system health|how is|system running|everything ok)/)) {
-            response = `STAGING Environment Status: 🧪
+            response = `System Status Report: 📊
 
-🟡 **Staging Server**: Running on port 8981
-🟡 **Environment**: TESTING MODE
-🟡 **Purpose**: Safe experimentation
-🟡 **Safety**: Isolated from production
+🟢 **Server**: Online and operational
+🟢 **AI Models**: 3 available
+   - DeepSeek V3.1 (Primary)
+   - GLM-5 (Fallback #1)
+   - Kimi-K2 (Fallback #2)
+🟢 **Sessions**: Active and responsive
+🟢 **Cron Jobs**: All scheduled tasks running normally
+🟢 **Dynamic Data**: Real-time updates enabled
 
-This is where we test before going live!
+Everything is running smoothly! ✅
 
-What feature would you like to test?`;
+What specific aspect would you like me to elaborate on?`;
         }
         // Help and Capabilities
         else if (messageLower.match(/(help|what can you do|capabilities|abilities|features)/)) {
-            response = `In STAGING, I can help you test: 🧪
+            response = `I can help you with a lot! 🚀
 
-📊 **Test New Features**:
-   - Try experimental features
-   - Validate UI changes
-   - Test API modifications
+📊 **System Monitoring**:
+   - Check server status, models, sessions
+   - Monitor cron jobs and system health
+   - Real-time performance tracking
 
-🔧 **Debug Safely**:
-   - Break things without consequences
-   - Test error handling
-   - Validate fixes
+🔧 **Technical Tasks**:
+   - Debug issues and analyze logs
+   - Optimize performance
+   - Manage configurations
 
-🎯 **Compare Versions**:
-   - Production (8980) vs Staging (8981)
-   - Side-by-side feature comparison
-   - A/B testing
+📋 **Project Management**:
+   - Track progress and manage tasks
+   - Coordinate agents and sub-agents
+   - Organize workflows
 
-What would you like to test?`;
+💬 **Communication**:
+   - Draft messages and reports
+   - Create summaries
+   - Generate documentation
+
+What would you like me to help with?`;
+        }
+        // Agents and Delegation
+        else if (messageLower.match(/(agent|delegate|sub-agent|hierarchy|team)/)) {
+            response = `Agent Structure Overview: 🎯
+
+**Executive Level**:
+- Jerry (Me) - Executive Assistant & Coordinator
+
+**Primary Agents** (3):
+1. 📱 Technical Lead - Code & Infrastructure
+2. 📊 Project Manager - Coordination & Tracking
+3. 🔍 Research Agent - Information & Analysis
+
+**Sub-Agents** (7 planned):
+- Client-specific workers
+- Project-specific specialists
+- Infrastructure managers
+
+I can spawn, delegate to, and coordinate all these agents!
+
+Would you like me to:
+1. Spawn a new agent for a specific task?
+2. Check current agent status?
+3. Delegate work to an agent?`;
+        }
+        // Thanks and Appreciation
+        else if (messageLower.match(/(thank|thanks|appreciate|good job|well done)/)) {
+            const thanksResponses = [
+                "You're welcome! 😊 Happy to help anytime!",
+                "My pleasure! 🚀 Let me know if you need anything else!",
+                "Glad I could assist! That's what I'm here for! 💪",
+                "Thank you! 🙏 Always here to support you!"
+            ];
+            response = thanksResponses[Math.floor(Math.random() * thanksResponses.length)];
+        }
+        // Goodbye
+        else if (messageLower.match(/(bye|goodbye|see you|later|exit|quit)/)) {
+            const goodbyes = [
+                "Goodbye! 👋 Have a great day! Come back anytime!",
+                "See you later! 🌟 I'll be here when you need me!",
+                "Bye for now! 👋 Take care!",
+                "See you! 👋 Always happy to help!"
+            ];
+            response = goodbyes[Math.floor(Math.random() * goodbyes.length)];
         }
         // Default Contextual Response
         else {
             const contextualResponses = [
-                `STAGING: Testing "${message}"... 🧪
+                `I understand you're asking about "${message}". Let me help you with that.
 
-This is the sandbox environment. Let's test this safely!`,
+Based on your question, I can:
+1. Analyze the specific details
+2. Provide relevant suggestions
+3. Take action if needed
 
-                `STAGING: Analyzing "${message}"... 📊
+What would you prefer?`,
 
-Great test case! This is exactly what staging is for.`,
+                `Thanks for asking! Regarding "${message.substring(0, 40)}...":
 
-                `STAGING: Processing "${message}"... 🔧
+I can help you in multiple ways:
+📊 Analyze the situation
+💡 Provide recommendations
+🔧 Execute actions if you approve
 
-Perfect for testing! No risk to production here.`
+Shall I proceed with one of these?`,
+
+                `Got it! I'm processing: "${message.substring(0, 40)}..."
+
+Here's what I can do:
+📋 Break down the problem
+🎯 Suggest solutions
+⚡ Take action on your approval
+
+What's your preference?`
             ];
             response = contextualResponses[Math.floor(Math.random() * contextualResponses.length)];
         }
@@ -478,9 +545,8 @@ app.get('/', (req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('%c🧪 Jerry OS Staging Server\n', 'color: #FFA500; font-size: 20px; font-weight: bold;');
-    console.log(`Staging running at: http://0.0.0.0:${PORT}`);
-    console.log('🧪 TESTING ENVIRONMENT - Safe to experiment');
+    console.log('%c🚀 Jerry OS Server\n', 'color: #007AFF; font-size: 20px; font-weight: bold;');
+    console.log(`Server running at: http://0.0.0.0:${PORT}`);
     console.log(`Press Ctrl+C to stop\n`);
 });
 

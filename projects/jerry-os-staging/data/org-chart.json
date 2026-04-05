@@ -1,11 +1,13 @@
 {
+    "source": "live",
+    "updatedAt": "2026-04-05T15:22:06.951Z",
     "director": {
         "id": "director",
         "name": "Sayan",
-        "role": "Founder, Rapid Cradters, Final authority on all decisions.",
+        "role": "Founder, Rapid Crafters, Final authority on all decisions.",
         "badge": "The Human",
         "icon": "crown",
-        "model": "deepseek-v3.1"
+        "model": "qwen3.6-plus"
     },
     "executive": {
         "id": "executive",
@@ -13,135 +15,123 @@
         "role": "Orchestration layer. Delegates to chiefs, manages crons, runs ops.",
         "badge": "Executive Assistant",
         "icon": "bot",
-        "status": "ACTIVE",
+        "status": "ERROR",
         "stats": [
-            "100% Load",
-            "Fast-Track",
+            "Last HB: 7h ago",
             "24/7 Monitoring"
         ],
-        "model": "deepseek-v3.1"
+        "model": "qwen3.6-plus:free"
     },
     "agents": [
         {
-            "id": "content-chief",
-            "name": "CC (Content Chief)",
-            "role": "Content & Media",
-            "description": "Manages, YouTube, blog posts, social media, bootcamp materials.",
-            "icon": "megaphone",
-            "status": "PLANNED",
-            "subAgentsCount": 3,
-            "subAgents": [
-                {
-                    "id": "content-sub-1",
-                    "name": "Video Editor AI",
-                    "role": "Final Cut & B-Roll",
-                    "icon": "film"
-                },
-                {
-                    "id": "content-sub-2",
-                    "name": "Copywriter AI",
-                    "role": "Scripts & Blogs",
-                    "icon": "pen-tool"
-                },
-                {
-                    "id": "content-sub-3",
-                    "name": "Social Manager",
-                    "role": "Engagement & Scheduling",
-                    "icon": "share-2"
-                }
-            ],
-            "activity": "Drafting outline for upcoming AI Bootcamp episode.",
-            "model": "deepseek-v3.1"
+            "id": "ceo",
+            "name": "CEO",
+            "role": "CEO",
+            "description": "ceo agent",
+            "icon": "crown",
+            "status": "STANDBY",
+            "subAgentsCount": 0,
+            "subAgents": [],
+            "activity": "Last heartbeat: 35m ago",
+            "model": "qwen3.6-plus"
         },
         {
-            "id": "dev-chief",
-            "name": "DC (Dev Chief)",
-            "role": "Engineering & DevOps",
-            "description": "Code quality, deployments, infrastructure, Jerry-OS development.",
-            "icon": "code-2",
-            "status": "PLANNED",
-            "subAgentsCount": 3,
-            "subAgents": [
-                {
-                    "id": "dev-sub-1",
-                    "name": "Frontend Agent",
-                    "role": "UI/UX & React",
-                    "icon": "palette"
-                },
-                {
-                    "id": "dev-sub-2",
-                    "name": "Backend Architect",
-                    "role": "APIs & Databases",
-                    "icon": "server",
-                    "model": "glm5",
-                    "description": ""
-                },
-                {
-                    "id": "dev-sub-3",
-                    "name": "DevOps Bot",
-                    "role": "CI/CD & Cloud",
-                    "icon": "cloud-lightning",
-                    "model": "glm5",
-                    "description": ""
-                }
-            ],
-            "activity": "Optimizing API response times for Brain module.",
-            "model": "deepseek-v3.1"
-        },
-        {
-            "id": "ops-chief",
-            "name": "OC (Ops Chief)",
-            "role": "Operations & Client Work",
-            "description": "Client project management, invoicing, task delegation, SLA tracking.",
-            "icon": "shield",
-            "status": "PLANNED",
-            "subAgentsCount": 2,
-            "subAgents": [
-                {
-                    "id": "ops-sub-1",
-                    "name": "Project Manager",
-                    "role": "SLA & Milestones",
-                    "icon": "calendar"
-                },
-                {
-                    "id": "ops-sub-2",
-                    "name": "Billing Agent",
-                    "role": "Invoices & Stripe",
-                    "icon": "credit-card"
-                }
-            ],
-            "activity": "Preparing monthly SLA reports for Clearmud clients.",
-            "model": "deepseek-v3.1"
-        },
-        {
-            "id": "intel-chief",
-            "name": "IC (Intel Chief)",
-            "role": "Research & Intelligence",
-            "description": "AI industry monitoring, competitive intelligence, opportunity scanning.",
-            "icon": "brain-circuit",
-            "status": "PLANNED",
-            "subAgentsCount": 2,
-            "subAgents": [
-                {
-                    "id": "intel-sub-1",
-                    "name": "Trend Spotter",
-                    "role": "X/Twitter & News",
-                    "icon": "search"
-                },
-                {
-                    "id": "intel-sub-2",
-                    "name": "Market Analyst",
-                    "role": "Growth & ROI",
-                    "icon": "trending-up"
-                }
-            ],
-            "activity": "Scanning AI trends for the next strategy update.",
-            "model": "deepseek-v3.1"
+            "id": "cto",
+            "name": "CTO",
+            "role": "Engineer",
+            "description": "engineer agent",
+            "icon": "code",
+            "status": "STANDBY",
+            "subAgentsCount": 0,
+            "subAgents": [],
+            "activity": "No heartbeat yet",
+            "model": "GLM5"
         }
     ],
     "stats": {
-        "total": 15,
-        "active": 1,
-        "planned": 14
-    }
+        "total": 3,
+        "active": 2,
+        "error": 1,
+        "paused": 0
+    },
+    "departments": [
+        {
+            "name": "Executive",
+            "agents": [
+                {
+                    "id": "62ab86e7-0ad8-4225-bdf2-4a8cc3100ae4",
+                    "name": "CEO",
+                    "role": "CEO",
+                    "roleKey": "ceo",
+                    "status": "idle",
+                    "icon": "crown",
+                    "statusColor": "#f59e0b",
+                    "color": "#eab308",
+                    "lastHeartbeatAt": "2026-04-05T14:46:14.676Z",
+                    "model": null,
+                    "heartbeatInterval": 3600
+                },
+                {
+                    "id": "0f9940ad-9494-463f-ad3b-9919d1b4da2a",
+                    "name": "Jerry",
+                    "role": "Executive Assistant",
+                    "roleKey": "general",
+                    "status": "error",
+                    "icon": "bot",
+                    "statusColor": "#ef4444",
+                    "color": "#10b981",
+                    "lastHeartbeatAt": "2026-04-05T08:04:56.291Z",
+                    "model": null,
+                    "heartbeatInterval": null
+                }
+            ]
+        },
+        {
+            "name": "Engineering",
+            "agents": [
+                {
+                    "id": "1fd5c355-bf07-4927-81e2-4aa067afc056",
+                    "name": "CTO",
+                    "role": "Engineer",
+                    "roleKey": "engineer",
+                    "status": "idle",
+                    "icon": "code",
+                    "statusColor": "#f59e0b",
+                    "color": "#3b82f6",
+                    "lastHeartbeatAt": null,
+                    "model": null,
+                    "heartbeatInterval": 300
+                }
+            ]
+        }
+    ],
+    "agentsRaw": [
+        {
+            "id": "62ab86e7-0ad8-4225-bdf2-4a8cc3100ae4",
+            "name": "CEO",
+            "role": "ceo",
+            "status": "idle",
+            "lastHeartbeatAt": "2026-04-05T14:46:14.676Z",
+            "model": null,
+            "heartbeatInterval": 3600
+        },
+        {
+            "id": "0f9940ad-9494-463f-ad3b-9919d1b4da2a",
+            "name": "Jerry",
+            "role": "general",
+            "status": "error",
+            "lastHeartbeatAt": "2026-04-05T08:04:56.291Z",
+            "model": null,
+            "heartbeatInterval": null
+        },
+        {
+            "id": "1fd5c355-bf07-4927-81e2-4aa067afc056",
+            "name": "CTO",
+            "role": "engineer",
+            "status": "idle",
+            "lastHeartbeatAt": null,
+            "model": null,
+            "heartbeatInterval": 300
+        }
+    ]
 }

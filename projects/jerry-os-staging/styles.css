@@ -2465,6 +2465,15 @@ body::after {
     box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
 }
 
+.mc-model-status.standby {
+    color: #fbbf24;
+}
+
+.mc-model-status.standby .mc-status-dot {
+    background: #fbbf24;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+}
+
 .mc-model-status.offline {
     color: var(--accent-red);
 }
@@ -2645,6 +2654,36 @@ body::after {
 
 .mc-cron-table .cron-dash {
     color: var(--text-tertiary);
+}
+
+.cron-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cron-status-badge.cron-running {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.cron-status-badge.cron-healthy {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--accent-green);
+}
+
+.cron-status-badge.cron-failed {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--accent-red);
+}
+
+.cron-status-badge.cron-idle {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
 }
 
 /* ── No Data Placeholder ── */

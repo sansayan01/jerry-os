@@ -1,0 +1,117 @@
+{
+  "project": "Hisaab Fatafat - Full Swipe Clone",
+  "goal": "Replicate Swipe's features and functionality for Hisaab Fatafat",
+  "started": "2026-04-04T07:45:00+05:30",
+  "phases": [
+    {
+      "id": 1,
+      "name": "UI Component Library",
+      "status": "pending",
+      "priority": "high",
+      "tasks": [
+        "Create reusable UI components matching Swipe's design",
+        "Button, Input, Dropdown, Table, Modal, Card, Badge",
+        "Sidebar navigation with collapsible menu",
+        "Header with search, notifications, profile"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Dashboard Page",
+      "status": "pending",
+      "priority": "high",
+      "tasks": [
+        "Stats cards (sales, customers, pending amounts)",
+        "Recent transactions list",
+        "Quick actions panel",
+        "Charts for insights"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Sales Module",
+      "status": "in_progress",
+      "priority": "high",
+      "tasks": [
+        "Invoices list page (partially done)",
+        "Invoice create/edit form",
+        "Credit Notes page",
+        "E-Invoices integration",
+        "Subscriptions management"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Purchases Module",
+      "status": "pending",
+      "priority": "medium",
+      "tasks": [
+        "Purchase orders list",
+        "Purchase create/edit",
+        "Bills management"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Products & Inventory",
+      "status": "pending",
+      "priority": "high",
+      "tasks": [
+        "Products list with categories",
+        "Product create/edit form",
+        "Inventory tracking",
+        "Stock alerts"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Parties (Customers/Vendors)",
+      "status": "pending",
+      "priority": "high",
+      "tasks": [
+        "Customers list page",
+        "Customer create/edit form",
+        "Vendors list page",
+        "Vendor create/edit form"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Payments Module",
+      "status": "pending",
+      "priority": "high",
+      "tasks": [
+        "Payments received list",
+        "Record payment form",
+        "Payment reminders"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Reports & Insights",
+      "status": "pending",
+      "priority": "medium",
+      "tasks": [
+        "Sales reports",
+        "GST reports",
+        "Profit/Loss statements",
+        "Dashboard insights"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Settings",
+      "status": "pending",
+      "priority": "medium",
+      "tasks": [
+        "Business profile settings",
+        "Invoice templates",
+        "Tax configuration",
+        "User management"
+      ]
+    }
+  ],
+  "activeAgents": [],
+  "completedTasks": [],
+  "blockers": []
+}
